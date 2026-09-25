@@ -55,7 +55,7 @@ resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   properties: {}
 }
 
-resource existingKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+resource existingKeyVault 'Microsoft.KeyVault/vaults@2026-02-01' existing = {
   name: keyVaultName
 }
 
