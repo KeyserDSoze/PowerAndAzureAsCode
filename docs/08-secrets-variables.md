@@ -237,6 +237,7 @@ GitHub Environment variables used by the runtime configuration workflow:
 
 - `DATAVERSE_URL`
 - `DATAVERSE_RUNTIME_CLIENT_ID`
+- `DATAVERSE_SECRET_NAME` (optional; defaults to `dataverse-client-secret`)
 
 These values belong to **Azure App Service application settings** or Key Vault references, not to the React build.
 
@@ -276,6 +277,24 @@ Dataverse:ClientSecret
 ```
 
 ASP.NET Core maps double underscores to nested configuration keys.
+
+---
+
+## Power Platform solution deployment
+
+The Dataverse solution deployment workflow uses GitHub Environment variables:
+
+- `POWERPLATFORM_DEPLOY_TENANT_ID`
+- `POWERPLATFORM_DEPLOY_CLIENT_ID`
+- `POWERPLATFORM_DEPLOY_ENVIRONMENT_URL`
+- `POWERPLATFORM_SOLUTION_PATH` (optional; defaults to `src/backends/dataverse/solution`)
+- `POWERPLATFORM_SOLUTION_PACKAGE_TYPE` (optional; `managed` or `unmanaged`)
+
+Repository-level deployment guard:
+
+- `POWERPLATFORM_SOLUTION_AUTO_DEPLOY`
+
+The deployment identity uses GitHub OIDC/FIC; no client secret is required by this workflow.
 
 ---
 
