@@ -17,6 +17,10 @@ const requiredFiles = [
   "scripts/bootstrap-swa-entra.sh",
   "scripts/bootstrap-azure-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-deployment-identity.sh",
+  "src/backends/powerpages/README.md",
+  ".github/workflows/deploy-powerplatform-solution.yml",
+  "scripts/install-powerpages-server-logic-example.mjs",
+  "scripts/bootstrap-powerplatform-solution.sh",
   "src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj",
   "src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj",
   "src/backends/powerpages/server-logic/health/server.js"
