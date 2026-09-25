@@ -19,5 +19,6 @@ This folder is the operational and architectural manual for the boilerplate.
 15. [Release runbook](14-release-runbook.md)
 16. [Troubleshooting](15-troubleshooting.md)
 17. [Microsoft references](16-microsoft-references.md)
+18. [Identity bootstrap: zero to production](17-identity-bootstrap.md)
 
 Architecture decisions are under [adr/](adr/).
