@@ -10,7 +10,7 @@ npm run validate
 npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
-dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
 ```
 
 Architecture, security, identity or deployment changes must update `docs/`. Add an ADR under `docs/adr/` when a long-lived architectural decision changes.
