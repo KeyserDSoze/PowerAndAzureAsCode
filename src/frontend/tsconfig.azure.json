@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@host-adapter": ["./src/platform/adapters/azure.ts"]
+    }
+  },
+  "exclude": [
+    "src/platform/adapters/powerapps.ts",
+    "src/platform/adapters/powerpages.ts"
+  ]
+}

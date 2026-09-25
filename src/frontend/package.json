@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite --mode azure",
-    "build:powerapps": "tsc -b && vite build --mode powerapps",
-    "build:powerpages": "tsc -b && vite build --mode powerpages",
-    "build:azure": "tsc -b && vite build --mode azure",
+    "build:powerapps": "tsc --noEmit -p tsconfig.powerapps.json && vite build --mode powerapps",
+    "build:powerpages": "tsc --noEmit -p tsconfig.powerpages.json && vite build --mode powerpages",
+    "build:azure": "tsc --noEmit -p tsconfig.azure.json && vite build --mode azure",
     "preview": "vite preview"
   },
   "dependencies": {

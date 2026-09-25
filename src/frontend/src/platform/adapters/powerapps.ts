@@ -6,9 +6,12 @@ export function createHostPlatformClient(): PlatformClient {
     host: "powerapps",
     async getCurrentUser() {
       const context = await getContext();
+      const id = context.user.objectId ?? context.user.userPrincipalName;
+      if (!id) return null;
+
       return {
-        id: context.user.objectId,
-        displayName: context.user.fullName || context.user.userPrincipalName
+        id,
+        displayName: context.user.fullName ?? context.user.userPrincipalName ?? id
       };
     },
     async health() {
