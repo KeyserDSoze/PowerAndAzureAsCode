@@ -62,7 +62,22 @@ jobs:
           echo "project_dir=$(dirname "${projects[0]}")" >> "$GITHUB_OUTPUT"
 
       - name: Build solution
-        run: dotnet build "${{ steps.solution.outputs.project }}" --configuration Release
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$PACKAGE_TYPE" in
+            managed) solution_package_type="Managed" ;;
+            unmanaged) solution_package_type="Unmanaged" ;;
+            *)
+              echo "POWERPLATFORM_SOLUTION_PACKAGE_TYPE must be managed or unmanaged." >&2
+              exit 1
+              ;;
+          esac
+
+          dotnet build "${{ steps.solution.outputs.project }}" \
+            --configuration Release \
+            -p:SolutionPackageType="$solution_package_type"
 
       - name: Locate package
         id: package
@@ -70,20 +85,11 @@ jobs:
         run: |
           set -euo pipefail
           output_dir="${{ steps.solution.outputs.project_dir }}/bin/Release"
-          mapfile -t all_zips < <(find "$output_dir" -type f -name '*.zip' | sort)
-
-          if [ "$PACKAGE_TYPE" = "managed" ]; then
-            mapfile -t candidates < <(printf '%s\n' "${all_zips[@]}" | grep -E '(_managed|managed)\.zip$' || true)
-          elif [ "$PACKAGE_TYPE" = "unmanaged" ]; then
-            mapfile -t candidates < <(printf '%s\n' "${all_zips[@]}" | grep -Ev '(_managed|managed)\.zip$' || true)
-          else
-            echo "POWERPLATFORM_SOLUTION_PACKAGE_TYPE must be managed or unmanaged." >&2
-            exit 1
-          fi
+          mapfile -t candidates < <(find "$output_dir" -type f -name '*.zip' | sort)
 
           if [ "${#candidates[@]}" -ne 1 ]; then
-            echo "Expected exactly one $PACKAGE_TYPE solution zip under $output_dir." >&2
-            printf '%s\n' "${all_zips[@]}"
+            echo "Expected exactly one solution zip under $output_dir, found ${#candidates[@]}." >&2
+            printf '%s\n' "${candidates[@]}"
             exit 1
           fi
 
