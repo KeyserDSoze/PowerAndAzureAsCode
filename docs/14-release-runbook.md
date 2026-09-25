@@ -83,13 +83,7 @@ Ensure Azure OIDC/FIC and App Service name are correct.
 
 Run API workflow.
 
-Verify:
-
-```text
-GET /api/health
-```
-
-through the Static Web App origin while authenticated.
+Verify the API from the authenticated Static Web App origin using `/api/health`, `/api/me` and `/api/dataverse/health`. The Dataverse connectivity endpoint must succeed before promotion.
 
 ## Dataverse runtime readiness
 
