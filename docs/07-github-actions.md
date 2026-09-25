@@ -54,6 +54,12 @@ Manually applies Dataverse URL/client ID and the Key Vault reference to App Serv
 
 Protected manual workflow that assigns the runtime application to Dataverse with an explicitly supplied security role using PAC CLI federation.
 
+### Power Platform solution
+
+`.github/workflows/deploy-powerplatform-solution.yml`
+
+Builds the derived Dataverse solution project and imports the selected managed/unmanaged package using PAC CLI + GitHub OIDC/FIC. The generic template intentionally has no product solution project until `scripts/bootstrap-powerplatform-solution.sh` is run in a derived repository.
+
 ### CodeQL
 
 `.github/workflows/codeql.yml`
@@ -85,6 +91,7 @@ Each normal code-deploy workflow has a **repository-level GitHub variable** that
 - `POWERPAGES_AUTO_DEPLOY`
 - `AZURE_FRONTEND_AUTO_DEPLOY`
 - `AZURE_API_AUTO_DEPLOY`
+- `POWERPLATFORM_SOLUTION_AUTO_DEPLOY`
 
 Manual `workflow_dispatch` is still available even when automatic deployment is disabled.
 
