@@ -12,7 +12,7 @@ and commit the generated `package-lock.json` in the derived repository. Once pre
 
 ## Power Apps workflow says power.config.json is missing
 
-Run from `apps/web`:
+Run from `src/frontend`:
 
 ```bash
 pa app init --display-name "<app-name>" --environment-id <environment-id>
