@@ -31,3 +31,12 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet restore src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
       - run: dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --configuration Release --no-restore
+
+  bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az bicep build --file infra/azure/main.bicep --stdout > /dev/null

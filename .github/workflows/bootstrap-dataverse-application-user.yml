@@ -1,0 +1,40 @@
+name: Bootstrap Dataverse Application User
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Protected GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+      runtime_client_id:
+        description: Runtime Entra application client ID
+        required: true
+        type: string
+      security_role:
+        description: Existing least-privilege Dataverse security role
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  assign:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+      - name: Authenticate PAC with GitHub federation
+        shell: bash
+        run: |
+          pac auth create             --tenant "${{ vars.POWERPLATFORM_BOOTSTRAP_TENANT_ID }}"             --applicationId "${{ vars.POWERPLATFORM_BOOTSTRAP_CLIENT_ID }}"             --githubFederated             --environment "${{ vars.DATAVERSE_URL }}"
+          pac auth who
+      - name: Create or assign Dataverse application user
+        shell: bash
+        run: |
+          pac admin assign-user             --environment "${{ vars.DATAVERSE_URL }}"             --user "${{ inputs.runtime_client_id }}"             --role "${{ inputs.security_role }}"             --application-user

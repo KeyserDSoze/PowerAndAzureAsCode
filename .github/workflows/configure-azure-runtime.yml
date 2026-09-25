@@ -1,0 +1,35 @@
+name: Configure Azure Dataverse Runtime
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Azure login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Configure Dataverse settings on App Service
+        shell: bash
+        run: |
+          test -n "${{ vars.DATAVERSE_URL }}"
+          test -n "${{ vars.DATAVERSE_RUNTIME_CLIENT_ID }}"
+          test -n "${{ vars.AZURE_KEY_VAULT_NAME }}"
+
+          az webapp config appsettings set             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --name "${{ vars.AZURE_API_WEBAPP_NAME }}"             --settings               "Dataverse__Url=${{ vars.DATAVERSE_URL }}"               "Dataverse__ClientId=${{ vars.DATAVERSE_RUNTIME_CLIENT_ID }}"               "Dataverse__ClientSecret=@Microsoft.KeyVault(VaultName=${{ vars.AZURE_KEY_VAULT_NAME }};SecretName=dataverse-client-secret)"             --output none
