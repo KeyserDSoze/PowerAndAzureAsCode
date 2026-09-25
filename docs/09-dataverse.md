@@ -82,6 +82,8 @@ Create:
 
 Do not assign System Administrator merely to make development easy.
 
+The repository includes a local bootstrap script and a protected manual GitHub workflow based on `pac admin assign-user --application-user --role`. The role is always explicit.
+
 ## End-user attribution
 
 Client-credential calls are performed in Dataverse as the application user.
@@ -96,6 +98,16 @@ Do not trust an arbitrary user ID supplied by the browser.
 
 For scenarios that require Dataverse to authorize as the end user, design a delegated/On-Behalf-Of flow explicitly rather than mixing it accidentally with application credentials.
 
+## Real connectivity check
+
+The Azure starter exposes:
+
+```http
+GET /api/dataverse/health
+```
+
+It opens a real Dataverse `ServiceClient` connection and executes `WhoAmI`. Success returns only connectivity status; the Dataverse user identifier and raw server faults are not returned.
+
 ## Connection factory
 
 The starter `DataverseConnectionFactory` proves the server-only boundary. It does not make arbitrary Dataverse tables accessible from the frontend.
@@ -109,6 +121,10 @@ IProfileService
 ```
 
 instead of exposing a generic entity-patch proxy.
+
+## Bootstrap
+
+Follow `17-identity-bootstrap.md` for the runtime App Registration, Key Vault, Dataverse Application User and validation sequence.
 
 ## Secrets
 
