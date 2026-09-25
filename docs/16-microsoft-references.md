@@ -25,6 +25,20 @@ Microsoft platform behavior changes. Re-check these sources before material plat
 - User information / x-ms-client-principal: https://learn.microsoft.com/azure/static-web-apps/user-information
 - Build/deploy configuration: https://learn.microsoft.com/azure/static-web-apps/build-configuration
 - Deployment tokens: https://learn.microsoft.com/azure/static-web-apps/deployment-token-management
+- Custom authentication: https://learn.microsoft.com/azure/static-web-apps/authentication-custom
+- Static Web Apps application settings: https://learn.microsoft.com/azure/static-web-apps/application-settings
+
+## Azure identity, secrets and observability
+
+- App Service Managed Identity: https://learn.microsoft.com/azure/app-service/overview-managed-identity
+- App Service Key Vault references: https://learn.microsoft.com/azure/app-service/app-service-key-vault-references
+- Azure RBAC role assignments: https://learn.microsoft.com/azure/role-based-access-control/role-assignments-cli
+
+## Dataverse application users
+
+- Manage application users: https://learn.microsoft.com/power-platform/admin/manage-application-users
+- PAC admin reference: https://learn.microsoft.com/power-platform/developer/cli/reference/admin
+- Dataverse server-to-server application user guidance: https://learn.microsoft.com/power-apps/developer/data-platform/use-multi-tenant-server-server-authentication
 
 ## .NET 10 / Azure Functions alternative
 
