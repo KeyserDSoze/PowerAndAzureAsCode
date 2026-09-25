@@ -7,6 +7,16 @@ const requiredFiles = [
   "apps/web/.env.powerpages",
   "apps/web/.env.azure",
   "azure/staticwebapp.config.template.json",
+  "azure/staticwebapp.singletenant.config.template.json",
+  "infra/azure/main.bicep",
+  "infra/azure/app-service.bicep",
+  "infra/azure/key-vault.bicep",
+  "infra/azure/observability.bicep",
+  "scripts/bootstrap-runtime-dataverse-identity.sh",
+  "scripts/bootstrap-dataverse-application-user.sh",
+  "scripts/bootstrap-swa-entra.sh",
+  "scripts/bootstrap-azure-deployment-identity.sh",
+  "scripts/bootstrap-powerplatform-deployment-identity.sh",
   "src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj"
 ];
 
