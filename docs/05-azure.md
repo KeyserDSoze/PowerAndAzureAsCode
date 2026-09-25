@@ -84,6 +84,9 @@ Required variables:
 - `AZURE_TENANT_ID`
 - `AZURE_SUBSCRIPTION_ID`
 - `AZURE_API_WEBAPP_NAME`
+
+Repository variable for automatic DEV API deployment:
+
 - `AZURE_API_AUTO_DEPLOY`
 
 No Azure client secret is required for the GitHub deployment identity when OIDC is configured.
