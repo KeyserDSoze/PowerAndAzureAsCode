@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using SecurityClaimTypes = System.Security.Claims.ClaimTypes;
 using Microsoft.Xrm.Sdk;
 using PowerAndAzureAsCode.Api.Auth;
 using PowerAndAzureAsCode.Api.Dataverse;
@@ -36,9 +37,9 @@ app.MapGet("/api/me", (HttpContext context) =>
 
     return Results.Ok(new
     {
-        id = context.User.FindFirstValue(ClaimTypes.NameIdentifier),
+        id = context.User.FindFirstValue(SecurityClaimTypes.NameIdentifier),
         name = context.User.Identity.Name,
-        roles = context.User.FindAll(ClaimTypes.Role).Select(role => role.Value).Distinct().OrderBy(role => role)
+        roles = context.User.FindAll(SecurityClaimTypes.Role).Select(role => role.Value).Distinct().OrderBy(role => role)
     });
 });
 
