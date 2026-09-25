@@ -28,7 +28,7 @@ Azure Functions .NET 10 isolated is a valid alternative. Use it when serverless 
 
 ## Static Web Apps authentication
 
-`azure/staticwebapp.config.template.json` protects `/*` and `/api/*` with the built-in `authenticated` role and redirects 401 responses to the Microsoft Entra sign-in route.
+`src/hosting/azure/staticwebapp.config.template.json` protects `/*` and `/api/*` with the built-in `authenticated` role and redirects 401 responses to the Microsoft Entra sign-in route.
 
 The built-in Entra provider is simple but can authenticate Microsoft accounts beyond one tenant. For enterprise single-tenant deployments, configure a custom Microsoft Entra provider and restrict the issuer to the customer tenant.
 
