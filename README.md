@@ -32,11 +32,12 @@ UI, routing, state, validation, domain models and application use-cases belong i
 
 - React + TypeScript + Vite frontend.
 - Explicit builds for `powerapps`, `powerpages` and `azure`.
-- Host adapter boundary under `apps/web/src/platform`.
+- Host adapter boundary under `src/frontend/src/platform`.
 - Power Pages Server Logic scaffold and CSRF-aware transport.
 - Azure Static Web Apps authenticated route configuration.
 - ASP.NET Core .NET 10 API starter for a linked Azure App Service backend.
 - Dataverse connection boundary for Azure, including a real `WhoAmI` connectivity endpoint.
+- Dataverse plug-in backend scaffold for shared Custom API business operations.
 - Azure Key Vault, App Service Managed Identity, Log Analytics and Application Insights Bicep baseline.
 - Admin bootstrap scripts for Entra runtime/deployment identities and Static Web Apps single-tenant auth.
 - GitHub Actions for CI and independent deployment to each host.
@@ -61,7 +62,7 @@ Build a target:
 npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
-dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
 ```
 
 Before starting a real application:
@@ -97,5 +98,7 @@ Fresh template repositories do **not** deploy automatically until the relevant `
 9. Tenant-administrator bootstrap of Entra application registrations is performed interactively; CI identities are not granted permanent Microsoft Graph application-management rights.
 
 For the complete Azure/Entra/Dataverse bootstrap, follow [docs/17-identity-bootstrap.md](docs/17-identity-bootstrap.md).
+
+Power Apps generated Dataverse services are client transports; shared authoritative business operations belong in `src/backends/dataverse` as Dataverse Custom APIs/plug-ins.
 
 See [docs/README.md](docs/README.md) for the full documentation index.
