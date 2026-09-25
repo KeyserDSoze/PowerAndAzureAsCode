@@ -15,10 +15,10 @@ npm run build:powerpages
 Output:
 
 ```text
-apps/web/dist/
+src/frontend/dist/
 ```
 
-The repository contains `apps/web/powerpages.config.json` for Code Site bundle behavior.
+The repository contains `src/frontend/powerpages.config.json` for Code Site bundle behavior.
 
 ## Upload
 
@@ -26,8 +26,8 @@ Power Pages Code Sites are managed with PAC CLI:
 
 ```bash
 pac pages upload-code-site \
-  --rootPath apps/web \
-  --compiledPath apps/web/dist \
+  --rootPath src/frontend \
+  --compiledPath src/frontend/dist \
   --siteName "Contoso Workspace"
 ```
 
@@ -67,7 +67,7 @@ Browser requests to Server Logic must contain the Power Pages CSRF token. The st
 The sample health endpoint is under:
 
 ```text
-powerpages/server-logic/health/server.js
+src/backends/powerpages/server-logic/health/server.js
 ```
 
 Create a Server Logic record named `health`, apply the intended web role, and place the source in that record. The sample frontend deliberately reports `degraded` until the endpoint exists.
