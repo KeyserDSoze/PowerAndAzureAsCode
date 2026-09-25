@@ -68,7 +68,7 @@ Required secret:
 
 - `AZURE_STATIC_WEB_APPS_API_TOKEN`
 
-Required variable for automatic deployment:
+Repository variable for automatic DEV deployment:
 
 - `AZURE_FRONTEND_AUTO_DEPLOY`
 
