@@ -1,11 +1,19 @@
-// Power Pages Server Logic source example.
-// Create a Server Logic record named "health" and assign the intended Web Role.
-// Server Logic is ECMAScript 2023 in a Microsoft-managed sandbox, not Node.js.
+// Generic Power Pages Server Logic template.
+// Install it into the deployable .powerpages-site metadata with the repository helper.
 
 function get() {
-  return JSON.stringify({
-    status: "ok",
-    runtime: "power-pages-server-logic",
-    activityId: Server.Context.ActivityId
-  });
+  try {
+    Server.Logger.Log("Boilerplate health endpoint called.");
+    return JSON.stringify({
+      status: "ok",
+      runtime: "power-pages-server-logic",
+      activityId: Server.Context.ActivityId
+    });
+  } catch (error) {
+    Server.Logger.Error("Boilerplate health endpoint failed.");
+    return JSON.stringify({
+      status: "error",
+      message: "Health check failed."
+    });
+  }
 }
