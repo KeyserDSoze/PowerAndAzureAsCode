@@ -96,6 +96,10 @@ Put target-specific variables and secrets in each environment. Protect `producti
 
 See `08-secrets-variables.md`.
 
+## Azure zero-to-production bootstrap
+
+If Azure is a target, complete `17-identity-bootstrap.md`. It covers GitHub OIDC, Key Vault, Managed Identity, the Dataverse runtime App Registration/Application User and single-tenant Static Web Apps authentication.
+
 ## Before first deployment
 
 Run:
