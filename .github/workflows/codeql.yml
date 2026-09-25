@@ -20,12 +20,33 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-dotnet@v4
         if: matrix.language == 'csharp'
         with:
           dotnet-version: 10.0.x
+
       - uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
+
       - uses: github/codeql-action/autobuild@v3
+        if: matrix.language == 'javascript-typescript'
+
+      - name: Restore Azure API
+        if: matrix.language == 'csharp'
+        run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+
+      - name: Restore Dataverse plug-in
+        if: matrix.language == 'csharp'
+        run: dotnet restore src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj
+
+      - name: Build Azure API for CodeQL
+        if: matrix.language == 'csharp'
+        run: dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --configuration Release --no-restore
+
+      - name: Build Dataverse plug-in for CodeQL
+        if: matrix.language == 'csharp'
+        run: dotnet build src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj --configuration Release --no-restore
+
       - uses: github/codeql-action/analyze@v3
