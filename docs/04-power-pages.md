@@ -92,6 +92,9 @@ Required target variables (GitHub Environment-scoped):
 - `POWERPAGES_CLIENT_ID`
 - `POWERPAGES_ENVIRONMENT_URL`
 - `POWERPAGES_SITE_NAME`
+
+Repository-level guard variable:
+
 - `POWERPAGES_AUTO_DEPLOY`
 
 No Power Pages deployment client secret is required by this boilerplate when OIDC/FIC is correctly configured.
@@ -119,7 +122,7 @@ Grant the corresponding application user only the Power Platform/Dataverse right
 7. activate the site if it is the first deployment;
 8. configure Server Logic records and web roles;
 9. test with a real authenticated user;
-10. enable auto-deploy only after DEV works.
+10. set the repository-level `POWERPAGES_AUTO_DEPLOY=true` only after DEV works.
 
 ## Microsoft documentation
 
