@@ -73,15 +73,21 @@ For single-tenant enterprise scenarios, replace the broad preconfigured provider
 
 The linked backend must stay linked/protected. Do not later change App Service authentication to allow arbitrary anonymous internet calls without adding an equivalent API authentication design.
 
+## Azure Key Vault and Managed Identity
+
+The Azure baseline gives the API App Service a system-assigned Managed Identity. That identity receives Key Vault read access so App Service can resolve the Dataverse runtime credential through a Key Vault reference. The GitHub deployment identity does not need the runtime credential.
+
+Tenant-level creation of Entra application registrations stays an explicit administrator bootstrap step. Normal CI identities are not granted permanent Microsoft Graph application-management permissions.
+
 ## Dataverse application user
 
 If the Azure API uses client credentials:
 
-- create an Entra application/service principal;
+- create a dedicated Entra application/service principal;
 - create the Dataverse application user;
 - assign a minimal custom security role;
-- store the credential only server-side;
-- rotate it.
+- keep the runtime credential in Key Vault;
+- rotate it independently from deployment identities.
 
 The Dataverse audit identity will be the application user for operations performed with client credentials. If business auditing must capture the real end user, store the application user context explicitly in domain records/commands or design an On-Behalf-Of/delegated flow.
 
