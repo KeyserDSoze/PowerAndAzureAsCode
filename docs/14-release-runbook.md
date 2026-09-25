@@ -19,14 +19,14 @@ npm run validate
 npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
-dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release
+dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release
 ```
 
 ## Power Apps release
 
 Preconditions:
 
-- `apps/web/power.config.json` initialized and committed in derived repo;
+- `src/frontend/power.config.json` initialized and committed in derived repo;
 - deployment service principal has environment access;
 - service principal has edit access to the existing Code App;
 - client secret is valid;
