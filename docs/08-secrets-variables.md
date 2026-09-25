@@ -185,6 +185,26 @@ Static Web Apps resource name.
 
 Azure App Service resource name hosting the .NET 10 API.
 
+#### `AZURE_KEY_VAULT_NAME`
+
+Azure Key Vault used for runtime secrets.
+
+#### `AZURE_LOG_ANALYTICS_WORKSPACE_NAME`
+
+Log Analytics workspace used by Application Insights.
+
+#### `AZURE_APP_INSIGHTS_NAME`
+
+Workspace-based Application Insights component name.
+
+#### `AZURE_SWA_AUTH_MODE`
+
+Use `preconfigured` or `singletenant` for the Azure Static Web Apps authentication provider.
+
+#### `AZURE_SWA_ENTRA_TENANT_ID`
+
+Required when `AZURE_SWA_AUTH_MODE=singletenant`.
+
 #### `AZURE_FRONTEND_AUTO_DEPLOY` (repository-level variable)
 
 Set to `true` to publish the frontend automatically on matching pushes.
@@ -213,6 +233,11 @@ The provided Azure App Service/API and infrastructure workflows use GitHub OIDC/
 
 ## Azure runtime -> Dataverse
 
+GitHub Environment variables used by the runtime configuration workflow:
+
+- `DATAVERSE_URL`
+- `DATAVERSE_RUNTIME_CLIENT_ID`
+
 These values belong to **Azure App Service application settings** or Key Vault references, not to the React build.
 
 ### `Dataverse__Url`
@@ -231,13 +256,16 @@ This runtime identity should normally be different from the GitHub deployment id
 
 Secret for the Dataverse runtime application identity.
 
-Prefer:
+The default path is:
 
 ```text
-App Service setting -> Key Vault reference -> Key Vault secret
+App Service setting -> Key Vault reference -> Key Vault
+                       ^
+                       |
+             App Service Managed Identity
 ```
 
-rather than copying the secret into GitHub.
+The runtime secret does not need to be copied into GitHub.
 
 The starter .NET code reads:
 
@@ -248,6 +276,18 @@ Dataverse:ClientSecret
 ```
 
 ASP.NET Core maps double underscores to nested configuration keys.
+
+---
+
+## Power Platform bootstrap workflow
+
+The optional manual workflow `bootstrap-dataverse-application-user.yml` uses:
+
+- `POWERPLATFORM_BOOTSTRAP_TENANT_ID`
+- `POWERPLATFORM_BOOTSTRAP_CLIENT_ID`
+- `DATAVERSE_URL`
+
+The runtime app client ID and Dataverse security role are explicit workflow inputs.
 
 ---
 
