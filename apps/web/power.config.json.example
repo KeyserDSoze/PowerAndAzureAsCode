@@ -1,0 +1,3 @@
+{
+  "_comment": "Run pa app init --display-name <name> --environment-id <environment-id> in apps/web. Do not copy fake environment/app IDs from a template."
+}
