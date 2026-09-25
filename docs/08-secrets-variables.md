@@ -52,7 +52,7 @@ pa app push --solution-id <value>
 
 Leave empty if the application is not being pushed into a solution.
 
-#### `POWERAPPS_AUTO_DEPLOY`
+#### `POWERAPPS_AUTO_DEPLOY` (repository-level variable)
 
 Set to the literal string:
 
@@ -133,7 +133,7 @@ pac pages upload-code-site --siteName ...
 
 The real site name is environment-specific configuration.
 
-#### `POWERPAGES_AUTO_DEPLOY`
+#### `POWERPAGES_AUTO_DEPLOY` (repository-level variable)
 
 Set to `true` only after manual DEV deployment succeeds.
 
@@ -185,11 +185,11 @@ Static Web Apps resource name.
 
 Azure App Service resource name hosting the .NET 10 API.
 
-#### `AZURE_FRONTEND_AUTO_DEPLOY`
+#### `AZURE_FRONTEND_AUTO_DEPLOY` (repository-level variable)
 
 Set to `true` to publish the frontend automatically on matching pushes.
 
-#### `AZURE_API_AUTO_DEPLOY`
+#### `AZURE_API_AUTO_DEPLOY` (repository-level variable)
 
 Set to `true` to publish the API automatically on matching pushes.
 
@@ -294,7 +294,7 @@ For every production GitHub Environment verify:
 - required reviewers configured;
 - OIDC/FIC subject references the production Environment;
 - only needed workflow variables exist;
-- auto-deploy is intentionally enabled or disabled;
+- repository-level auto-deploy guards are intentionally enabled or disabled;
 - Power Apps client secret rotation owner is known;
 - SWA deployment token rotation owner is known;
 - Azure runtime Dataverse secret is in Key Vault or equivalent secure storage;
