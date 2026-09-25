@@ -10,9 +10,9 @@ resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
     features: {
       enableLogAccessUsingOnlyResourcePermissions: true
     }
-  }
-  sku: {
-    name: 'PerGB2018'
+    sku: {
+      name: 'PerGB2018'
+    }
   }
 }
 
