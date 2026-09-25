@@ -56,10 +56,18 @@ command -v az >/dev/null 2>&1 || {
 
 az account show >/dev/null
 
-APP_ID="$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv)"
+mapfile -t APP_IDS < <(az ad app list --display-name "$APP_NAME" --query "[].appId" -o tsv)
+if [[ "${#APP_IDS[@]}" -gt 1 ]]; then
+  echo "More than one Entra application has display name '$APP_NAME'. Use a unique display name." >&2
+  exit 1
+fi
 
+APP_ID="${APP_IDS[0]:-}"
 if [[ -z "$APP_ID" ]]; then
-  APP_ID="$(az ad app create     --display-name "$APP_NAME"     --sign-in-audience AzureADMyOrg     --query appId -o tsv)"
+  APP_ID="$(az ad app create \
+    --display-name "$APP_NAME" \
+    --sign-in-audience AzureADMyOrg \
+    --query appId -o tsv)"
 fi
 
 if ! az ad sp show --id "$APP_ID" >/dev/null 2>&1; then
