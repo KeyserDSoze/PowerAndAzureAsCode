@@ -56,9 +56,14 @@ It creates:
 
 - Static Web Apps Standard;
 - Linux App Service Plan;
-- Linux App Service configured for .NET 10.
+- Linux App Service configured for .NET 10;
+- system-assigned Managed Identity on App Service;
+- Azure Key Vault with RBAC authorization;
+- Key Vault access for the App Service Managed Identity;
+- Log Analytics workspace;
+- workspace-based Application Insights.
 
-The infrastructure workflow links the backend after provisioning.
+The infrastructure workflow links the backend after provisioning and configures Application Insights for the API.
 
 ## Frontend deployment
 
