@@ -41,6 +41,10 @@ jobs:
           dotnet-version: 10.0.x
       - run: dotnet restore src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj
       - run: dotnet build src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj --configuration Release --no-restore
+      - name: Verify Dataverse plug-in package
+        run: |
+          set -euo pipefail
+          find src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/bin/Release -type f -name '*.nupkg' -print -quit | grep -q .
 
   bicep:
     runs-on: ubuntu-latest
