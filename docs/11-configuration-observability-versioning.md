@@ -5,9 +5,9 @@
 Only host-selection configuration is committed by default:
 
 ```text
-apps/web/.env.powerapps
-apps/web/.env.powerpages
-apps/web/.env.azure
+src/frontend/.env.powerapps
+src/frontend/.env.powerpages
+src/frontend/.env.azure
 ```
 
 These contain no secrets.
