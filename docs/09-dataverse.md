@@ -140,6 +140,20 @@ instead of exposing a generic entity-patch proxy.
 
 The generic plug-in scaffold is under `src/backends/dataverse`. Use this layer for business operations that must behave identically from Power Apps, Power Pages and Azure.
 
+## Solution ALM
+
+The plug-in project is a Dataverse plug-in **package** project. A derived product creates its solution project with:
+
+```bash
+bash scripts/bootstrap-powerplatform-solution.sh ...
+```
+
+The actual Custom API definitions and other product Dataverse components are then synchronized into that solution source and promoted with `deploy-powerplatform-solution.yml`.
+
+The generic template deliberately does not hard-code a publisher prefix or customer-specific Custom API records.
+
+See `19-power-platform-alm.md`.
+
 ## Bootstrap
 
 Follow `17-identity-bootstrap.md` for the runtime App Registration, Key Vault, Dataverse Application User and validation sequence.
