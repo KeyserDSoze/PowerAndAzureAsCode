@@ -8,7 +8,8 @@
 4. bump version if required;
 5. run local validation;
 6. merge through required PR controls;
-7. deploy DEV manually first for new infrastructure/identity changes.
+7. deploy DEV manually first for new infrastructure/identity changes;
+8. for a new Azure environment, complete `17-identity-bootstrap.md` before enabling automatic deployment.
 
 ## Validation commands
 
