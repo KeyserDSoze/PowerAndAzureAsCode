@@ -1,0 +1,47 @@
+name: Deploy Power Pages Code Site
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "powerpages/**"
+      - "scripts/**"
+      - ".github/workflows/deploy-powerpages.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.POWERPAGES_AUTO_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npm run build:powerpages
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+      - name: Authenticate with GitHub federation
+        shell: bash
+        run: |
+          pac auth create             --tenant "${{ vars.POWERPAGES_TENANT_ID }}"             --applicationId "${{ vars.POWERPAGES_CLIENT_ID }}"             --githubFederated             --environment "${{ vars.POWERPAGES_ENVIRONMENT_URL }}"
+          pac auth who
+      - name: Upload Code Site
+        shell: bash
+        run: |
+          pac pages upload-code-site             --rootPath apps/web             --compiledPath apps/web/dist             --siteName "${{ vars.POWERPAGES_SITE_NAME }}"

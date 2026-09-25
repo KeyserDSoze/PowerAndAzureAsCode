@@ -1,0 +1,39 @@
+name: Deploy Azure Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Azure login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Ensure resource group
+        run: az group create --name "${{ vars.AZURE_RESOURCE_GROUP }}" --location "${{ vars.AZURE_LOCATION }}"
+      - name: Deploy Bicep
+        run: |
+          az deployment group create             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --template-file infra/azure/main.bicep             --parameters               staticWebAppName="${{ vars.AZURE_STATIC_WEB_APP_NAME }}"               apiWebAppName="${{ vars.AZURE_API_WEBAPP_NAME }}"               location="${{ vars.AZURE_LOCATION }}"
+      - name: Link App Service backend to Static Web App
+        shell: bash
+        run: |
+          API_ID=$(az webapp show             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --name "${{ vars.AZURE_API_WEBAPP_NAME }}"             --query id -o tsv)
+
+          az staticwebapp backends link             --name "${{ vars.AZURE_STATIC_WEB_APP_NAME }}"             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --backend-resource-id "$API_ID"             --backend-region "${{ vars.AZURE_LOCATION }}"

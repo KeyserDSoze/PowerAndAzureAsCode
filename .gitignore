@@ -18,4 +18,3 @@ obj/
 *.pem
 *.key
 artifacts/
-apps/web/power.config.json

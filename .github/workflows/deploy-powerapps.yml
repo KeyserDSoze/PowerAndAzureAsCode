@@ -1,0 +1,52 @@
+name: Deploy Power Apps Code App
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "scripts/**"
+      - ".github/workflows/deploy-powerapps.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.POWERAPPS_AUTO_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'development' }}
+    env:
+      PA_CLI_USE_SP_AUTH: "true"
+      PA_CLI_SP_CLIENT_ID: ${{ vars.POWERAPPS_CLIENT_ID }}
+      PA_CLI_SP_TENANT_ID: ${{ vars.POWERAPPS_TENANT_ID }}
+      PA_CLI_SP_CLIENT_SECRET: ${{ secrets.POWERAPPS_CLIENT_SECRET }}
+      POWERAPPS_SOLUTION_ID: ${{ vars.POWERAPPS_SOLUTION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm install --no-audit --no-fund
+      - run: npm install --global @microsoft/power-apps-cli @microsoft/power-apps
+      - run: npm run build:powerapps
+      - name: Validate initialized Code App
+        run: test -f apps/web/power.config.json || (echo "Run 'pa app init' in apps/web and commit power.config.json in the derived application repository." && exit 1)
+      - name: Publish
+        working-directory: apps/web
+        shell: bash
+        run: |
+          if [ -n "$POWERAPPS_SOLUTION_ID" ]; then
+            pa app push --non-interactive --solution-id "$POWERAPPS_SOLUTION_ID"
+          else
+            pa app push --non-interactive
+          fi

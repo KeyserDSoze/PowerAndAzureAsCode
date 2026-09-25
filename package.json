@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "npm --workspace @powerandazure/web run dev",
     "build": "npm run build:azure",
-    "build:powerapps": "npm --workspace @powerandazure/web run build:powerapps",
-    "build:powerpages": "npm --workspace @powerandazure/web run build:powerpages",
+    "build:powerapps": "npm --workspace @powerandazure/web run build:powerapps && node scripts/write-version.mjs",
+    "build:powerpages": "npm --workspace @powerandazure/web run build:powerpages && node scripts/write-version.mjs",
     "build:azure": "npm --workspace @powerandazure/web run build:azure && node scripts/render-staticwebapp-config.mjs && node scripts/write-version.mjs",
     "validate": "node scripts/validate-config.mjs",
     "version:write": "node scripts/write-version.mjs",

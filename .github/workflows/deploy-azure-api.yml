@@ -1,0 +1,44 @@
+name: Deploy Azure .NET API
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+  push:
+    branches: [main]
+    paths:
+      - "src/azure-api/**"
+      - ".github/workflows/deploy-azure-api.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.AZURE_API_AUTO_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'development' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Azure login with OIDC
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Publish
+        run: dotnet publish src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release -o artifacts/api
+      - name: Deploy App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ vars.AZURE_API_WEBAPP_NAME }}
+          package: artifacts/api
