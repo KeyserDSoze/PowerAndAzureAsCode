@@ -74,6 +74,10 @@ Verify:
 - `x-ms-client-principal` reaches the linked backend;
 - App Service direct-access auth was not manually weakened/broken.
 
+## Static Web Apps single-tenant sign-in fails
+
+Check the GitHub Environment auth mode/tenant, the SWA application settings, and the Entra callback URI. Re-run `scripts/bootstrap-swa-entra.sh` after replacing the Static Web App or changing its hostname.
+
 ## Azure API says Dataverse is not configured
 
 Set App Service configuration:
@@ -85,6 +89,10 @@ Dataverse__ClientSecret
 ```
 
 Prefer Key Vault reference for the secret.
+
+## Dataverse health returns HTTP 503
+
+Check the Key Vault reference, App Service Managed Identity, Key Vault RBAC assignment, runtime App Registration and Dataverse Application User. Use Application Insights/server logs rather than exposing raw Dataverse faults in the browser.
 
 ## Dataverse returns insufficient privilege
 
@@ -98,7 +106,7 @@ Azure API/runtime schema can evolve. Confirm the current supported Linux runtime
 
 Normal push deployment is guarded.
 
-Set the correct Environment variable to the literal `true`:
+Set the correct repository-level variable to the literal `true`:
 
 - `POWERAPPS_AUTO_DEPLOY`
 - `POWERPAGES_AUTO_DEPLOY`
