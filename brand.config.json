@@ -1,0 +1,6 @@
+{
+  "productName": "PowerAndAzureAsCode",
+  "shortName": "PowerAzureCode",
+  "npmScope": "@powerandazure",
+  "description": "Reusable multi-host React boilerplate for Power Apps, Power Pages and Azure."
+}
