@@ -29,8 +29,8 @@ jobs:
       SWA_AUTH_MODE: ${{ vars.AZURE_SWA_AUTH_MODE || 'preconfigured' }}
       SWA_ENTRA_TENANT_ID: ${{ vars.AZURE_SWA_ENTRA_TENANT_ID }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - run: npm install --no-audit --no-fund
