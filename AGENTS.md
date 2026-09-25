@@ -24,7 +24,7 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 ## Non-negotiable rules
 
 1. Feature components MUST NOT know their host.
-2. Host-specific behavior MUST stay behind `apps/web/src/platform`.
+2. Host-specific behavior MUST stay behind `src/frontend/src/platform`.
 3. Business rules MUST NOT be reimplemented per host.
 4. Browser code MUST NOT contain Dataverse client secrets, certificates, service-principal credentials or deployment tokens.
 5. Vite variables are public configuration, never secrets.
@@ -45,15 +45,19 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 20. Tenant-level Entra application creation MUST remain an explicit admin bootstrap step; do not give normal GitHub deployment identities permanent Graph application-management privileges.
 21. Dataverse Application User bootstrap MUST require an explicitly supplied security role; never default to System Administrator.
 22. App Service reads Key Vault references through its Managed Identity; do not copy the Dataverse runtime secret into GitHub.
+23. Power Apps generated Dataverse services are client transports, not the authoritative backend.
+24. Cross-host business invariants belong in Dataverse Custom APIs/plugins under `src/backends/dataverse` unless an ADR explicitly selects another canonical backend.
 
 ## Repository map
 
 ```text
 .github/workflows/                   CI/CD
-apps/web/                            shared React SPA
-apps/web/src/platform/               host adapters
-powerpages/server-logic/             Server Logic examples
-src/azure-api/                       ASP.NET Core .NET 10 API
+src/frontend/                            shared React SPA
+src/frontend/src/platform/               host adapters
+src/backends/powerpages/server-logic/             Server Logic examples
+src/backends/azure-api/                       ASP.NET Core .NET 10 API
+src/backends/dataverse/                       Dataverse Custom API plug-in backend
+src/backends/powerpages/                      Power Pages Server Logic
 infra/azure/                         Azure Bicep baseline: SWA, App Service, Key Vault, MI, Insights
 scripts/                             validation/rebranding/version helpers
 docs/                                runbooks and architecture
@@ -73,7 +77,7 @@ Feature code MUST use `createPlatformClient()`, never read `VITE_HOST_TARGET` di
 
 ## Power Apps
 
-Initialize the derived application by running `pa app init` from `apps/web`. Do not commit fabricated `power.config.json` identifiers in the template.
+Initialize the derived application by running `pa app init` from `src/frontend`. Do not commit fabricated `power.config.json` identifiers in the template.
 
 Generated Dataverse/connector services belong behind application repositories/services rather than being imported throughout the UI.
 
@@ -117,6 +121,6 @@ npm run validate
 npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
-dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
 az bicep build --file infra/azure/main.bicep --stdout > /dev/null
 ```
