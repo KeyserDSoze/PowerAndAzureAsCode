@@ -36,7 +36,9 @@ UI, routing, state, validation, domain models and application use-cases belong i
 - Power Pages Server Logic scaffold and CSRF-aware transport.
 - Azure Static Web Apps authenticated route configuration.
 - ASP.NET Core .NET 10 API starter for a linked Azure App Service backend.
-- Dataverse connection boundary for Azure.
+- Dataverse connection boundary for Azure, including a real `WhoAmI` connectivity endpoint.
+- Azure Key Vault, App Service Managed Identity, Log Analytics and Application Insights Bicep baseline.
+- Admin bootstrap scripts for Entra runtime/deployment identities and Static Web Apps single-tenant auth.
 - GitHub Actions for CI and independent deployment to each host.
 - OIDC/Federated Identity guidance where supported.
 - Complete secrets/variables inventory.
@@ -77,6 +79,8 @@ npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
 | Azure frontend | `deploy-azure-frontend.yml` | Static Web Apps deployment token |
 | Azure .NET API | `deploy-azure-api.yml` | Azure OIDC/FIC |
 | Azure infrastructure | `deploy-azure-infra.yml` | Azure OIDC/FIC |
+| Azure runtime configuration | `configure-azure-runtime.yml` | Azure OIDC/FIC |
+| Dataverse Application User bootstrap | `bootstrap-dataverse-application-user.yml` | Power Platform OIDC/FIC |
 
 Fresh template repositories do **not** deploy automatically until the relevant `*_AUTO_DEPLOY` repository-level GitHub variable is explicitly enabled. Manual deployments remain available.
 
@@ -89,5 +93,9 @@ Fresh template repositories do **not** deploy automatically until the relevant `
 5. Azure Static Web Apps protects routes with Microsoft Entra ID; a linked App Service is reachable through the Static Web App integration.
 6. Dataverse application users must receive least-privilege security roles.
 7. Cross-host business rules should live in a canonical backend such as Dataverse Custom APIs/plugins, not in three adapters.
+8. Azure runtime credentials belong in Key Vault and are resolved by App Service through its Managed Identity.
+9. Tenant-administrator bootstrap of Entra application registrations is performed interactively; CI identities are not granted permanent Microsoft Graph application-management rights.
+
+For the complete Azure/Entra/Dataverse bootstrap, follow [docs/17-identity-bootstrap.md](docs/17-identity-bootstrap.md).
 
 See [docs/README.md](docs/README.md) for the full documentation index.
