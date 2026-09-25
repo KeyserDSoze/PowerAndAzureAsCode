@@ -11,9 +11,9 @@ public sealed class StaticWebAppsPrincipalMiddleware(RequestDelegate next, IWebH
     public async Task InvokeAsync(HttpContext context)
     {
         if (context.Request.Headers.TryGetValue(HeaderName, out var header) &&
-            !string.IsNullOrWhiteSpace(header))
+            !string.IsNullOrWhiteSpace(header.ToString()))
         {
-            context.User = Parse(header!);
+            context.User = Parse(header.ToString());
         }
         else if (environment.IsDevelopment())
         {

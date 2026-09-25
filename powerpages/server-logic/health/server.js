@@ -3,14 +3,9 @@
 // Server Logic is ECMAScript 2023 in a Microsoft-managed sandbox, not Node.js.
 
 function get() {
-  return {
-    status: 200,
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      status: "ok",
-      runtime: "power-pages-server-logic"
-    })
-  };
+  return JSON.stringify({
+    status: "ok",
+    runtime: "power-pages-server-logic",
+    activityId: Server.Context.ActivityId
+  });
 }
