@@ -32,13 +32,27 @@ In Development only, the middleware creates a local developer principal when the
 
 Do not copy that development fallback into an environment marked Production.
 
-## Health endpoint
+## Example endpoints
+
+All example endpoints require an authenticated Static Web Apps principal.
 
 ```http
 GET /api/health
 ```
 
-The endpoint requires an authenticated principal and reports whether Dataverse configuration is present without returning credentials.
+Reports process/runtime health and whether Dataverse configuration is present.
+
+```http
+GET /api/me
+```
+
+Demonstrates the trusted user principal propagated from Static Web Apps to ASP.NET Core.
+
+```http
+GET /api/dataverse/health
+```
+
+Creates a real Dataverse `ServiceClient` and executes `WhoAmI`. It returns only connectivity status, never the Dataverse user identifier or raw fault.
 
 ## Dataverse
 
@@ -50,7 +64,7 @@ Microsoft.PowerPlatform.Dataverse.Client
 
 The connection factory reads ASP.NET Core configuration.
 
-Production should use App Service settings/Key Vault references.
+Production uses App Service settings plus a Key Vault reference by default. The Bicep baseline enables a system-assigned App Service Managed Identity and grants it Key Vault read access.
 
 ## Recommended derived structure
 
@@ -95,7 +109,7 @@ Do not leak:
 
 ## Application Insights
 
-Add Application Insights in a derived product when Azure is a real target.
+Application Insights is part of the Azure baseline. The project references `Microsoft.ApplicationInsights.AspNetCore`, and the infrastructure workflow configures `APPLICATIONINSIGHTS_CONNECTION_STRING` from the provisioned workspace-based Application Insights component.
 
 Recommended telemetry:
 
