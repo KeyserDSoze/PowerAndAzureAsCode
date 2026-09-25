@@ -49,7 +49,7 @@ npm run validate
 npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
-dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
 ```
 
 ## Rebrand before first deployment
@@ -77,7 +77,7 @@ npm run dev
 For a Power Apps Code App, use the Power Apps local host after initializing the app:
 
 ```bash
-cd apps/web
+cd src/frontend
 pa app init --display-name "Contoso Workspace" --environment-id <environment-id>
 pa app run
 ```
@@ -109,7 +109,7 @@ npm run validate
 npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
-dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release
+dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release
 ```
 
 Then follow the target-specific guide.
