@@ -36,14 +36,28 @@ Putting those rules in React creates inconsistent behavior and weakens security.
 
 ## Power Apps path
 
+For simple CRUD:
+
 ```text
 React feature
  -> application repository
- -> generated Power Apps Dataverse service/action
+ -> generated Power Apps Dataverse table service
  -> Dataverse
 ```
 
-Use Power Apps CLI to add the required Dataverse data sources/actions/functions after the derived app is initialized.
+For authoritative business operations:
+
+```text
+React feature
+ -> application use-case/repository
+ -> generated Power Apps Dataverse Custom API service
+ -> Dataverse Custom API
+ -> Dataverse plug-in
+```
+
+The generated TypeScript service is client transport code, not the backend business layer.
+
+Use Power Apps CLI to add Dataverse tables/actions/functions after the derived app is initialized. See `18-dataverse-backend.md`.
 
 ## Power Pages path
 
@@ -121,6 +135,10 @@ IProfileService
 ```
 
 instead of exposing a generic entity-patch proxy.
+
+## Shared Dataverse backend
+
+The generic plug-in scaffold is under `src/backends/dataverse`. Use this layer for business operations that must behave identically from Power Apps, Power Pages and Azure.
 
 ## Bootstrap
 
