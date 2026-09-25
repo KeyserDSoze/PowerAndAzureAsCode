@@ -5,7 +5,11 @@ updates:
     schedule:
       interval: weekly
   - package-ecosystem: nuget
-    directory: /src/azure-api/PowerAndAzureAsCode.Api
+    directory: /src/backends/azure-api/PowerAndAzureAsCode.Api
+    schedule:
+      interval: weekly
+  - package-ecosystem: nuget
+    directory: /src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins
     schedule:
       interval: weekly
   - package-ecosystem: github-actions

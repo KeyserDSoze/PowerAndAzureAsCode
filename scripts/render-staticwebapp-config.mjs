@@ -2,13 +2,13 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 
 const authMode = (process.env.SWA_AUTH_MODE ?? "preconfigured").toLowerCase();
-const dist = resolve("apps/web/dist");
+const dist = resolve("src/frontend/dist");
 
 let source;
 if (authMode === "singletenant") {
-  source = resolve("azure/staticwebapp.singletenant.config.template.json");
+  source = resolve("src/hosting/azure/staticwebapp.singletenant.config.template.json");
 } else if (authMode === "preconfigured") {
-  source = resolve("azure/staticwebapp.config.template.json");
+  source = resolve("src/hosting/azure/staticwebapp.config.template.json");
 } else {
   throw new Error("SWA_AUTH_MODE must be 'preconfigured' or 'singletenant'.");
 }
@@ -20,7 +20,6 @@ if (authMode === "singletenant") {
   if (!tenantId || !/^[A-Za-z0-9.-]+$/.test(tenantId)) {
     throw new Error("SWA_ENTRA_TENANT_ID is required for singletenant auth mode.");
   }
-
   content = content.replaceAll("__ENTRA_TENANT_ID__", tenantId);
 }
 

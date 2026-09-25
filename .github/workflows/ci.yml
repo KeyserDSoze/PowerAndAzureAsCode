@@ -22,15 +22,25 @@ jobs:
       - run: npm run build:powerpages
       - run: npm run build:azure
 
-  dotnet:
+  azure-api:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
-      - run: dotnet restore src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
-      - run: dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --configuration Release --no-restore
+      - run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+      - run: dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --configuration Release --no-restore
+
+  dataverse-plugin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet restore src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj
+      - run: dotnet build src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj --configuration Release --no-restore
 
   bicep:
     runs-on: ubuntu-latest

@@ -1,5 +1,8 @@
 * @KeyserDSoze
 /.github/ @KeyserDSoze
 /infra/ @KeyserDSoze
-/src/azure-api/ @KeyserDSoze
-/powerpages/ @KeyserDSoze
+/src/frontend/ @KeyserDSoze
+/src/backends/azure-api/ @KeyserDSoze
+/src/backends/dataverse/ @KeyserDSoze
+/src/backends/powerpages/ @KeyserDSoze
+/src/hosting/azure/ @KeyserDSoze

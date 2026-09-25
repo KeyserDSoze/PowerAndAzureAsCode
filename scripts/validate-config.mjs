@@ -3,11 +3,11 @@ import { resolve } from "node:path";
 
 const requiredFiles = [
   "brand.config.json",
-  "apps/web/.env.powerapps",
-  "apps/web/.env.powerpages",
-  "apps/web/.env.azure",
-  "azure/staticwebapp.config.template.json",
-  "azure/staticwebapp.singletenant.config.template.json",
+  "src/frontend/.env.powerapps",
+  "src/frontend/.env.powerpages",
+  "src/frontend/.env.azure",
+  "src/hosting/azure/staticwebapp.config.template.json",
+  "src/hosting/azure/staticwebapp.singletenant.config.template.json",
   "infra/azure/main.bicep",
   "infra/azure/app-service.bicep",
   "infra/azure/key-vault.bicep",
@@ -17,7 +17,9 @@ const requiredFiles = [
   "scripts/bootstrap-swa-entra.sh",
   "scripts/bootstrap-azure-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-deployment-identity.sh",
-  "src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj"
+  "src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj",
+  "src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj",
+  "src/backends/powerpages/server-logic/health/server.js"
 ];
 
 for (const file of requiredFiles) await access(resolve(file));

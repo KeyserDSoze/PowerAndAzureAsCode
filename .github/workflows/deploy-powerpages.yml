@@ -12,8 +12,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "apps/web/**"
-      - "powerpages/**"
+      - "src/frontend/**"
+      - "src/backends/powerpages/**"
+      - "src/backends/dataverse/**"
       - "scripts/**"
       - ".github/workflows/deploy-powerpages.yml"
 
@@ -43,4 +44,4 @@ jobs:
       - name: Upload Code Site
         shell: bash
         run: |
-          pac pages upload-code-site             --rootPath apps/web             --compiledPath apps/web/dist             --siteName "${{ vars.POWERPAGES_SITE_NAME }}"
+          pac pages upload-code-site             --rootPath src/frontend             --compiledPath src/frontend/dist             --siteName "${{ vars.POWERPAGES_SITE_NAME }}"

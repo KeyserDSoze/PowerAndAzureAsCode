@@ -2,7 +2,7 @@
   "name": "power-and-azure-as-code",
   "private": true,
   "version": "0.0.1",
-  "workspaces": ["apps/web"],
+  "workspaces": ["src/frontend"],
   "scripts": {
     "dev": "npm --workspace @powerandazure/web run dev",
     "build": "npm run build:azure",

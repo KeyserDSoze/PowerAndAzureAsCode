@@ -12,7 +12,8 @@ on:
   push:
     branches: [main]
     paths:
-      - "apps/web/**"
+      - "src/frontend/**"
+      - "src/backends/dataverse/**"
       - "scripts/**"
       - ".github/workflows/deploy-powerapps.yml"
 
@@ -39,9 +40,9 @@ jobs:
       - run: npm install --global @microsoft/power-apps-cli @microsoft/power-apps
       - run: npm run build:powerapps
       - name: Validate initialized Code App
-        run: test -f apps/web/power.config.json || (echo "Run 'pa app init' in apps/web and commit power.config.json in the derived application repository." && exit 1)
+        run: test -f src/frontend/power.config.json || (echo "Run 'pa app init' in src/frontend and commit power.config.json in the derived application repository." && exit 1)
       - name: Publish
-        working-directory: apps/web
+        working-directory: src/frontend
         shell: bash
         run: |
           if [ -n "$POWERAPPS_SOLUTION_ID" ]; then

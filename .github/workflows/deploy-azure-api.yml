@@ -12,7 +12,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/azure-api/**"
+      - "src/backends/azure-api/**"
       - ".github/workflows/deploy-azure-api.yml"
 
 permissions:
@@ -36,7 +36,7 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       - name: Publish
-        run: dotnet publish src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release -o artifacts/api
+        run: dotnet publish src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release -o artifacts/api
       - name: Deploy App Service
         uses: azure/webapps-deploy@v3
         with:

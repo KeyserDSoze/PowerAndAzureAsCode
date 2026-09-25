@@ -8,6 +8,6 @@ const payload = {
   builtAtUtc: new Date().toISOString()
 };
 
-const outDir = resolve("apps/web/dist");
+const outDir = resolve("src/frontend/dist");
 await mkdir(outDir, { recursive: true });
 await writeFile(resolve(outDir, "version.json"), JSON.stringify(payload, null, 2) + "\n");
