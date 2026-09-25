@@ -60,7 +60,7 @@ resource existingKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 }
 
 resource apiKeyVaultSecretsUser 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(existingKeyVault.id, appService.outputs.apiResourceId, 'KeyVaultSecretsUser')
+  name: guid(existingKeyVault.id, apiWebAppName, 'KeyVaultSecretsUser')
   scope: existingKeyVault
   properties: {
     principalId: appService.outputs.principalId
