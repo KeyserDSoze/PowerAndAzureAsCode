@@ -1,0 +1,100 @@
+name: Deploy Power Platform Solution
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment
+        required: true
+        type: choice
+        options: [development, test, production]
+        default: development
+  push:
+    branches: [main]
+    paths:
+      - "src/backends/dataverse/**"
+      - ".github/workflows/deploy-powerplatform-solution.yml"
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || vars.POWERPLATFORM_SOLUTION_AUTO_DEPLOY == 'true' }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'development' }}
+    env:
+      SOLUTION_ROOT: ${{ vars.POWERPLATFORM_SOLUTION_PATH || 'src/backends/dataverse/solution' }}
+      PACKAGE_TYPE: ${{ vars.POWERPLATFORM_SOLUTION_PACKAGE_TYPE || 'unmanaged' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install Power Platform CLI
+        uses: microsoft/powerplatform-actions/actions-install@v1
+
+      - name: Authenticate PAC with GitHub federation
+        shell: bash
+        run: |
+          pac auth create \
+            --tenant "${{ vars.POWERPLATFORM_DEPLOY_TENANT_ID }}" \
+            --applicationId "${{ vars.POWERPLATFORM_DEPLOY_CLIENT_ID }}" \
+            --githubFederated \
+            --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}"
+          pac auth who
+
+      - name: Locate solution project
+        id: solution
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t projects < <(find "$SOLUTION_ROOT" -type f -name '*.cdsproj' | sort)
+          if [ "${#projects[@]}" -ne 1 ]; then
+            echo "Expected exactly one .cdsproj under $SOLUTION_ROOT, found ${#projects[@]}." >&2
+            echo "Run scripts/bootstrap-powerplatform-solution.sh in the derived repository." >&2
+            exit 1
+          fi
+          echo "project=${projects[0]}" >> "$GITHUB_OUTPUT"
+          echo "project_dir=$(dirname "${projects[0]}")" >> "$GITHUB_OUTPUT"
+
+      - name: Build solution
+        run: dotnet build "${{ steps.solution.outputs.project }}" --configuration Release
+
+      - name: Locate package
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          output_dir="${{ steps.solution.outputs.project_dir }}/bin/Release"
+          mapfile -t all_zips < <(find "$output_dir" -type f -name '*.zip' | sort)
+
+          if [ "$PACKAGE_TYPE" = "managed" ]; then
+            mapfile -t candidates < <(printf '%s\n' "${all_zips[@]}" | grep -E '(_managed|managed)\.zip$' || true)
+          elif [ "$PACKAGE_TYPE" = "unmanaged" ]; then
+            mapfile -t candidates < <(printf '%s\n' "${all_zips[@]}" | grep -Ev '(_managed|managed)\.zip$' || true)
+          else
+            echo "POWERPLATFORM_SOLUTION_PACKAGE_TYPE must be managed or unmanaged." >&2
+            exit 1
+          fi
+
+          if [ "${#candidates[@]}" -ne 1 ]; then
+            echo "Expected exactly one $PACKAGE_TYPE solution zip under $output_dir." >&2
+            printf '%s\n' "${all_zips[@]}"
+            exit 1
+          fi
+
+          echo "path=${candidates[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Import solution
+        shell: bash
+        run: |
+          pac solution import \
+            --path "${{ steps.package.outputs.path }}" \
+            --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}" \
+            --activate-plugins \
+            --publish-changes \
+            --async
