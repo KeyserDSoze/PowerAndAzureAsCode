@@ -21,5 +21,6 @@ This folder is the operational and architectural manual for the boilerplate.
 17. [Microsoft references](16-microsoft-references.md)
 18. [Identity bootstrap: zero to production](17-identity-bootstrap.md)
 19. [Dataverse backend and Power Apps](18-dataverse-backend.md)
+20. [Power Platform solution ALM](19-power-platform-alm.md)
 
 Architecture decisions are under [adr/](adr/).
