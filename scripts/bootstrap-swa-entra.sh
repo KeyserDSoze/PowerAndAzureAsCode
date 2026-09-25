@@ -52,12 +52,27 @@ if [[ -z "$HOSTNAME" ]]; then
 fi
 
 REDIRECT_URI="https://$HOSTNAME/.auth/login/aad/callback"
-APP_ID="$(az ad app list --display-name "$APP_NAME" --query "[0].appId" -o tsv)"
+mapfile -t APP_IDS < <(az ad app list --display-name "$APP_NAME" --query "[].appId" -o tsv)
+if [[ "${#APP_IDS[@]}" -gt 1 ]]; then
+  echo "More than one Entra application has display name '$APP_NAME'. Use a unique display name." >&2
+  exit 1
+fi
+
+APP_ID="${APP_IDS[0]:-}"
 
 if [[ -z "$APP_ID" ]]; then
-  APP_ID="$(az ad app create     --display-name "$APP_NAME"     --sign-in-audience AzureADMyOrg     --web-redirect-uris "$REDIRECT_URI"     --query appId -o tsv)"
+  APP_ID="$(az ad app create \
+    --display-name "$APP_NAME" \
+    --sign-in-audience AzureADMyOrg \
+    --web-redirect-uris "$REDIRECT_URI" \
+    --query appId -o tsv)"
 else
-  az ad app update     --id "$APP_ID"     --web-redirect-uris "$REDIRECT_URI"
+  mapfile -t EXISTING_REDIRECTS < <(az ad app show --id "$APP_ID" --query "web.redirectUris[]" -o tsv)
+  REDIRECTS=("${EXISTING_REDIRECTS[@]}")
+  if [[ ! " ${REDIRECTS[*]} " =~ " $REDIRECT_URI " ]]; then
+    REDIRECTS+=("$REDIRECT_URI")
+  fi
+  az ad app update --id "$APP_ID" --web-redirect-uris "${REDIRECTS[@]}"
 fi
 
 if ! az ad sp show --id "$APP_ID" >/dev/null 2>&1; then
