@@ -64,13 +64,48 @@ Do not use Node-only APIs such as `fs`, `require`, process control or arbitrary 
 
 Browser requests to Server Logic must contain the Power Pages CSRF token. The starter Power Pages adapter retrieves the token from `/_layout/tokenhtml`.
 
-The sample health endpoint is under:
+The generic templates are under:
 
 ```text
-src/backends/powerpages/server-logic/health/server.js
+src/backends/powerpages/server-logic/
 ```
 
-Create a Server Logic record named `health`, apply the intended web role, and place the source in that record. The sample frontend deliberately reports `degraded` until the endpoint exists.
+Those files are **templates**, not deployable Code Site metadata.
+
+After the Code Site has been deployed/downloaded once, Power Pages creates/populates:
+
+```text
+src/frontend/.powerpages-site/
+```
+
+Deployable Server Logic must live under:
+
+```text
+src/frontend/.powerpages-site/server-logic/<name>/
+  <name>.js
+  <name>.serverlogic.yml
+```
+
+Use the repository helper to materialize the reviewed examples against the real site's web-role metadata:
+
+```bash
+node scripts/install-powerpages-server-logic-example.mjs \
+  --name health \
+  --web-role-name "Authenticated Users"
+```
+
+or:
+
+```bash
+node scripts/install-powerpages-server-logic-example.mjs \
+  --name boilerplate-ping \
+  --web-role-name "Authenticated Users" \
+  --publisher-prefix abc
+```
+
+Commit the generated `.powerpages-site` files. The normal `pac pages upload-code-site` deployment then carries Server Logic, web roles/table-permission metadata and the compiled SPA together.
+
+The sample frontend deliberately reports `degraded` until the health Server Logic metadata has been installed and deployed.
 
 ## CI/CD authentication
 
@@ -120,9 +155,11 @@ Grant the corresponding application user only the Power Platform/Dataverse right
 5. set GitHub Environment variables;
 6. run the manual deployment workflow;
 7. activate the site if it is the first deployment;
-8. configure Server Logic records and web roles;
-9. test with a real authenticated user;
-10. set the repository-level `POWERPAGES_AUTO_DEPLOY=true` only after DEV works.
+8. commit the generated `.powerpages-site` metadata;
+9. install/configure Server Logic records and web roles using the real site metadata;
+10. redeploy the Code Site;
+11. test with a real authenticated user;
+12. set the repository-level `POWERPAGES_AUTO_DEPLOY=true` only after DEV works.
 
 ## Microsoft documentation
 
