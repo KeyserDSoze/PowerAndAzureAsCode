@@ -1,5 +1,5 @@
-import { readFile, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
+import { readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
+import { extname, join, relative, resolve } from "node:path";
 
 const args = process.argv.slice(2);
 const valueAfter = (flag) => {
@@ -7,36 +7,140 @@ const valueAfter = (flag) => {
   return index >= 0 ? args[index + 1] : undefined;
 };
 
-const name = valueAfter("--name");
+const displayName = valueAfter("--name");
 const scope = valueAfter("--scope");
 
-if (!name || !scope || !scope.startsWith("@")) {
+if (!displayName || !scope || !scope.startsWith("@")) {
   console.error('Usage: npm run rebrand -- --name "Product Name" --scope "@company"');
   process.exit(1);
 }
 
+const toCodeName = (value) => {
+  const compact = value.replace(/[^a-zA-Z0-9]/g, "");
+  if (!compact) return "Application";
+  return /^[0-9]/.test(compact) ? `App${compact}` : compact;
+};
+
+const toPackageName = (value) =>
+  value
+    .trim()
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase() || "application";
+
 const configPath = resolve("brand.config.json");
 const config = JSON.parse(await readFile(configPath, "utf8"));
-const oldName = config.productName;
-const oldScope = config.npmScope;
 
-config.productName = name;
-config.shortName = name.replace(/[^a-zA-Z0-9]/g, "").slice(0, 24) || "Application";
+const oldDisplayName = config.productName;
+const oldCodeName = toCodeName(oldDisplayName);
+const oldScope = config.npmScope;
+const newCodeName = toCodeName(displayName);
+
+config.productName = displayName;
+config.shortName = newCodeName.slice(0, 24);
 config.npmScope = scope;
 await writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
 
-for (const file of [
+const displayFiles = [
   "README.md",
   "src/frontend/index.html",
   "src/frontend/src/App.tsx",
-  "src/frontend/powerpages.config.json",
-  "src/frontend/package.json"
-]) {
+  "src/frontend/powerpages.config.json"
+];
+
+for (const file of displayFiles) {
   const path = resolve(file);
   let content = await readFile(path, "utf8");
-  content = content.replaceAll(oldName, name).replaceAll(oldScope, scope);
+  content = content
+    .replaceAll(oldDisplayName, displayName)
+    .replaceAll(oldScope, scope);
   await writeFile(path, content);
 }
 
-console.log("Repository-controlled branding updated.");
-console.log("External Entra, Power Platform, Azure and GitHub resources were NOT renamed.");
+const ignoredDirectories = new Set([
+  ".git",
+  "node_modules",
+  "dist",
+  "bin",
+  "obj",
+  "artifacts",
+  ".powerpages-site"
+]);
+
+const textExtensions = new Set([
+  ".md", ".json", ".ts", ".tsx", ".js", ".mjs", ".yml", ".yaml",
+  ".cs", ".csproj", ".bicep", ".sh", ".html", ".xml", ".config"
+]);
+
+const displayFileSet = new Set(displayFiles.map((file) => resolve(file)));
+
+async function walk(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const result = [];
+
+  for (const entry of entries) {
+    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+
+    const full = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      result.push(...(await walk(full)));
+    } else {
+      result.push(full);
+    }
+  }
+
+  return result;
+}
+
+const files = await walk(resolve("."));
+
+for (const file of files) {
+  if (displayFileSet.has(file) || !textExtensions.has(extname(file))) continue;
+
+  let content = await readFile(file, "utf8");
+  const next = content
+    .replaceAll(oldCodeName, newCodeName)
+    .replaceAll(oldScope, scope);
+
+  if (next !== content) {
+    await writeFile(file, next);
+  }
+}
+
+const rootPackagePath = resolve("package.json");
+const rootPackage = JSON.parse(await readFile(rootPackagePath, "utf8"));
+rootPackage.name = toPackageName(displayName);
+await writeFile(rootPackagePath, JSON.stringify(rootPackage, null, 2) + "\n");
+
+const frontendPackagePath = resolve("src/frontend/package.json");
+const frontendPackage = JSON.parse(await readFile(frontendPackagePath, "utf8"));
+frontendPackage.name = `${scope}/web`;
+await writeFile(frontendPackagePath, JSON.stringify(frontendPackage, null, 2) + "\n");
+
+async function renameMatchingPaths(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+
+    const current = join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      await renameMatchingPaths(current);
+    }
+
+    if (entry.name.includes(oldCodeName)) {
+      const renamed = join(directory, entry.name.replaceAll(oldCodeName, newCodeName));
+      await rename(current, renamed);
+    }
+  }
+}
+
+await renameMatchingPaths(resolve("src"));
+
+console.log(`Display name: ${displayName}`);
+console.log(`Code identifier: ${newCodeName}`);
+console.log(`npm scope: ${scope}`);
+console.log("Repository-controlled source names and project paths updated.");
+console.log("External Entra, Power Platform, Azure, GitHub and existing .powerpages-site resources were NOT renamed.");
