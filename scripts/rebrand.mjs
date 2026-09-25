@@ -27,10 +27,10 @@ await writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
 
 for (const file of [
   "README.md",
-  "apps/web/index.html",
-  "apps/web/src/App.tsx",
-  "apps/web/powerpages.config.json",
-  "apps/web/package.json"
+  "src/frontend/index.html",
+  "src/frontend/src/App.tsx",
+  "src/frontend/powerpages.config.json",
+  "src/frontend/package.json"
 ]) {
   const path = resolve(file);
   let content = await readFile(path, "utf8");
