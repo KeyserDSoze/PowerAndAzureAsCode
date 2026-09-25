@@ -78,7 +78,7 @@ npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
 | Azure .NET API | `deploy-azure-api.yml` | Azure OIDC/FIC |
 | Azure infrastructure | `deploy-azure-infra.yml` | Azure OIDC/FIC |
 
-Fresh template repositories do **not** deploy automatically until the relevant `*_AUTO_DEPLOY` GitHub Environment variable is explicitly enabled. Manual deployments remain available.
+Fresh template repositories do **not** deploy automatically until the relevant `*_AUTO_DEPLOY` repository-level GitHub variable is explicitly enabled. Manual deployments remain available.
 
 ## Security
 
