@@ -95,3 +95,21 @@ src/backends/powerpages/server-logic/boilerplate-ping/server.js
 ```
 
 The sample is generic and contains no customer-specific tables or business rules.
+
+
+## ALM
+
+The Dataverse plug-in project uses `Microsoft.PowerApps.MSBuild.Plugin`, so it is ready to be referenced as a plug-in package from a Power Platform solution project.
+
+In a derived product:
+
+```bash
+bash scripts/bootstrap-powerplatform-solution.sh \
+  --solution-name "ProductSolution" \
+  --publisher-name "Company" \
+  --publisher-prefix "abc"
+```
+
+Create the actual product Custom APIs in the development solution, synchronize them back to source, and deploy the solution through `.github/workflows/deploy-powerplatform-solution.yml`.
+
+See `19-power-platform-alm.md`.
