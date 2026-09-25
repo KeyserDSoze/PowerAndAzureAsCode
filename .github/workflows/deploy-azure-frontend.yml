@@ -30,7 +30,7 @@ jobs:
       SWA_ENTRA_TENANT_ID: ${{ vars.AZURE_SWA_ENTRA_TENANT_ID }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - run: npm install --no-audit --no-fund
