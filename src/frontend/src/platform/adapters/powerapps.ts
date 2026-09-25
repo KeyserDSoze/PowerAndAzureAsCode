@@ -1,19 +1,31 @@
+import { getContext } from "@microsoft/power-apps/app";
 import type { PlatformClient } from "../types";
 
-export function createPowerAppsPlatformClient(): PlatformClient {
+export function createHostPlatformClient(): PlatformClient {
   return {
     host: "powerapps",
     async getCurrentUser() {
-      // Authentication belongs to the Power Apps host.
-      // Map only the application-safe identity projection here in a derived application.
-      return null;
+      const context = await getContext();
+      return {
+        id: context.user.objectId,
+        displayName: context.user.fullName || context.user.userPrincipalName
+      };
     },
     async health() {
-      return {
-        status: "ok",
-        host: "powerapps",
-        detail: "Power Apps host loaded. Add Dataverse/connectors with the Power Apps CLI and keep generated services behind application repositories."
-      };
+      try {
+        await getContext();
+        return {
+          status: "ok",
+          host: "powerapps",
+          detail: "Power Apps host context is reachable."
+        };
+      } catch (error) {
+        return {
+          status: "degraded",
+          host: "powerapps",
+          detail: error instanceof Error ? error.message : "Power Apps host context is unavailable."
+        };
+      }
     }
   };
 }

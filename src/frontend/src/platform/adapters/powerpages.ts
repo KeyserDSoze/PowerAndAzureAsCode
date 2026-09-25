@@ -1,5 +1,19 @@
 import type { PlatformClient } from "../types";
 
+type PowerPagesWindow = Window & {
+  Microsoft?: {
+    Dynamic365?: {
+      Portal?: {
+        User?: {
+          userName?: string;
+          firstName?: string;
+          lastName?: string;
+        };
+      };
+    };
+  };
+};
+
 async function getCsrfToken(): Promise<string> {
   const response = await fetch("/_layout/tokenhtml", { credentials: "same-origin" });
   if (!response.ok) throw new Error(`Unable to obtain Power Pages CSRF token: ${response.status}`);
@@ -18,21 +32,36 @@ async function safeServerLogicFetch(path: string, init: RequestInit = {}) {
   return fetch(path, { ...init, headers, credentials: "same-origin" });
 }
 
-export function createPowerPagesPlatformClient(): PlatformClient {
+export function createHostPlatformClient(): PlatformClient {
   return {
     host: "powerpages",
     async getCurrentUser() {
-      return null;
+      const user = (window as PowerPagesWindow).Microsoft?.Dynamic365?.Portal?.User;
+      if (!user?.userName) return null;
+
+      const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ").trim();
+      return {
+        id: user.userName,
+        displayName: fullName || user.userName
+      };
     },
     async health() {
       try {
         const response = await safeServerLogicFetch("/_api/serverlogics/health");
         if (!response.ok) {
-          return { status: "degraded", host: "powerpages", detail: `Health Server Logic returned HTTP ${response.status}. Configure the health record/web role or replace this starter check.` };
+          return {
+            status: "degraded",
+            host: "powerpages",
+            detail: `Health Server Logic returned HTTP ${response.status}. Configure the health record/web role or replace this starter check.`
+          };
         }
         return { status: "ok", host: "powerpages", detail: "Power Pages session and Server Logic are reachable." };
       } catch (error) {
-        return { status: "degraded", host: "powerpages", detail: error instanceof Error ? error.message : "Power Pages health check failed." };
+        return {
+          status: "degraded",
+          host: "powerpages",
+          detail: error instanceof Error ? error.message : "Power Pages health check failed."
+        };
       }
     }
   };
