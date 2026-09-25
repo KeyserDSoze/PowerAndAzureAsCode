@@ -34,6 +34,8 @@ The built-in Entra provider is simple but can authenticate Microsoft accounts be
 
 Treat this as a production readiness item.
 
+For a tenant-restricted deployment, use `scripts/bootstrap-swa-entra.sh`, then set `AZURE_SWA_AUTH_MODE=singletenant` and `AZURE_SWA_ENTRA_TENANT_ID` in the GitHub Environment.
+
 ## Linked backend
 
 Static Web Apps Standard can link an Azure App Service backend. Requests under `/api` are proxied to the linked App Service.
@@ -105,6 +107,9 @@ No Azure client secret is required for the GitHub deployment identity when OIDC 
 - `AZURE_LOCATION`
 - `AZURE_STATIC_WEB_APP_NAME`
 - `AZURE_API_WEBAPP_NAME`
+- `AZURE_KEY_VAULT_NAME`
+- `AZURE_LOG_ANALYTICS_WORKSPACE_NAME`
+- `AZURE_APP_INSIGHTS_NAME`
 
 The deployment principal needs appropriate Azure RBAC on the resource group/subscription scope.
 
@@ -116,7 +121,9 @@ Configure on App Service:
 - `Dataverse__ClientId`
 - `Dataverse__ClientSecret`
 
-Prefer an App Service Key Vault reference for the secret.
+The default runtime path uses an App Service Key Vault reference resolved through the App Service Managed Identity.
+
+Use `scripts/bootstrap-runtime-dataverse-identity.sh` for the one-time runtime identity bootstrap, then `configure-azure-runtime.yml` for repeatable non-secret configuration.
 
 These are **runtime** values. They are not frontend Vite values.
 
@@ -130,6 +137,10 @@ These are **runtime** values. They are not frontend Vite values.
 - custom domain and TLS policy;
 - network/private endpoint requirements assessed per customer;
 - explicit backup/disaster recovery strategy for the systems that store business data.
+
+## End-to-end bootstrap
+
+Follow `17-identity-bootstrap.md` for the complete Azure/Entra/Dataverse sequence.
 
 ## Microsoft documentation
 
