@@ -5,7 +5,7 @@
 The starter API is:
 
 ```text
-src/azure-api/PowerAndAzureAsCode.Api/
+src/backends/azure-api/PowerAndAzureAsCode.Api/
 ```
 
 and targets:
