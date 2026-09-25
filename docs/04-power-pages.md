@@ -86,7 +86,7 @@ pac auth create \
 
 This avoids storing a Power Platform deployment client secret in GitHub.
 
-Required variables:
+Required target variables (GitHub Environment-scoped):
 
 - `POWERPAGES_TENANT_ID`
 - `POWERPAGES_CLIENT_ID`
