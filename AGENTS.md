@@ -18,6 +18,8 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 - GitHub Actions.
 - Microsoft Entra ID.
 - OIDC/Federated Identity Credentials where supported.
+- Azure Key Vault + App Service Managed Identity.
+- Log Analytics + Application Insights.
 
 ## Non-negotiable rules
 
@@ -39,6 +41,10 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 16. Fresh template repositories MUST NOT auto-deploy production.
 17. Never place real tenant/customer IDs or secrets in documentation.
 18. Domain-specific tables/endpoints do not belong in this generic boilerplate.
+19. Runtime Entra application credentials MUST be written directly to a server-side secret store; bootstrap scripts MUST NOT print them.
+20. Tenant-level Entra application creation MUST remain an explicit admin bootstrap step; do not give normal GitHub deployment identities permanent Graph application-management privileges.
+21. Dataverse Application User bootstrap MUST require an explicitly supplied security role; never default to System Administrator.
+22. App Service reads Key Vault references through its Managed Identity; do not copy the Dataverse runtime secret into GitHub.
 
 ## Repository map
 
@@ -48,7 +54,7 @@ apps/web/                            shared React SPA
 apps/web/src/platform/               host adapters
 powerpages/server-logic/             Server Logic examples
 src/azure-api/                       ASP.NET Core .NET 10 API
-infra/azure/                         Azure Bicep baseline
+infra/azure/                         Azure Bicep baseline: SWA, App Service, Key Vault, MI, Insights
 scripts/                             validation/rebranding/version helpers
 docs/                                runbooks and architecture
 docs/adr/                            architecture decisions
@@ -93,6 +99,8 @@ Entra-authenticated Static Web App
 
 Static Web Apps Standard is required for linked App Service integration.
 
+Production Azure infrastructure also provisions Key Vault, a system-assigned App Service Managed Identity, Log Analytics and Application Insights. See `docs/17-identity-bootstrap.md` before changing identity provisioning.
+
 ## Configuration
 
 Read `docs/08-secrets-variables.md` before modifying workflows. Tenant IDs, client IDs, URLs and resource names are normally variables; client secrets, certificates and deployment tokens are secrets.
@@ -110,4 +118,5 @@ npm run build:powerapps
 npm run build:powerpages
 npm run build:azure
 dotnet build src/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+az bicep build --file infra/azure/main.bicep --stdout > /dev/null
 ```
