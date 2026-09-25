@@ -64,7 +64,12 @@ Verify:
 - region;
 - Static Web Apps Standard;
 - App Service .NET 10;
-- linked backend.
+- linked backend;
+- Key Vault;
+- App Service system-assigned Managed Identity;
+- Key Vault access role assignment;
+- Log Analytics;
+- Application Insights.
 
 ## Azure frontend release
 
