@@ -42,6 +42,18 @@ Uses Azure OIDC, publishes .NET 10, deploys to App Service.
 
 Creates/updates Azure resources via Bicep and links App Service as the Static Web Apps backend.
 
+### Azure runtime configuration
+
+`.github/workflows/configure-azure-runtime.yml`
+
+Manually applies Dataverse URL/client ID and the Key Vault reference to App Service after the runtime identity has been bootstrapped.
+
+### Dataverse Application User bootstrap
+
+`.github/workflows/bootstrap-dataverse-application-user.yml`
+
+Protected manual workflow that assigns the runtime application to Dataverse with an explicitly supplied security role using PAC CLI federation.
+
 ### CodeQL
 
 `.github/workflows/codeql.yml`
@@ -109,3 +121,8 @@ Recommended:
 The root package starts at `0.0.1`.
 
 Derived products should bump version for releases. `scripts/write-version.mjs` writes `version.json` into the compiled frontend artifact containing version, commit SHA and build timestamp.
+
+
+## Privileged bootstrap scripts
+
+Creation of Entra app registrations is intentionally not performed by normal CI. Tenant administrators use the scripts documented in `17-identity-bootstrap.md`, then GitHub Actions operate with OIDC/FIC and least-privilege runtime identities.
