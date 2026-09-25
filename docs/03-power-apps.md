@@ -54,7 +54,7 @@ Authentication is owned by the Power Apps host. Do not add a second MSAL login f
 
 Current Code Apps publishing supports service-principal authentication for `pa app push --non-interactive`.
 
-Required GitHub Environment values:
+Required values (target IDs/secrets are GitHub Environment-scoped; the auto-deploy guard is a repository variable):
 
 Variables:
 
