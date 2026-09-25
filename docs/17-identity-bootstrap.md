@@ -38,6 +38,7 @@ Run:
 bash scripts/bootstrap-azure-deployment-identity.sh \
   --app-name "Contoso Workspace GitHub Azure" \
   --repository "owner/repository" \
+  --github-environment "development" \
   --subscription-id "<subscription-guid>" \
   --resource-group "<resource-group>"
 ```
@@ -46,9 +47,7 @@ The script creates/reuses:
 
 - Entra app registration;
 - service principal;
-- GitHub Federated Identity Credential for `development`;
-- GitHub Federated Identity Credential for `test`;
-- GitHub Federated Identity Credential for `production`.
+- one GitHub Federated Identity Credential for the explicitly selected GitHub Environment.
 
 It grants at resource-group scope:
 
@@ -59,7 +58,7 @@ The second role is required because the Bicep template creates the Key Vault rol
 
 No Azure deployment client secret is created.
 
-Store in each GitHub Environment:
+Run the bootstrap once for each target environment/resource-group trust boundary that you actually need. Store in the selected GitHub Environment:
 
 ```text
 AZURE_TENANT_ID
@@ -272,13 +271,14 @@ For PAC CLI deployments, a separate OIDC deployment identity can be bootstrapped
 bash scripts/bootstrap-powerplatform-deployment-identity.sh \
   --app-name "Contoso Workspace GitHub Power Platform" \
   --repository "owner/repository" \
+  --github-environment "development" \
   --environment "https://contoso.crm4.dynamics.com" \
   --role "<existing-deployment-security-role>"
 ```
 
 The role must be explicitly supplied.
 
-The script creates/reuses the Entra app and service principal, creates environment-scoped GitHub FIC entries, and assigns the application user to Dataverse.
+The script creates/reuses the Entra app and service principal, creates the FIC only for the explicitly selected GitHub Environment, and assigns the application user only to the target Dataverse environment. Run it separately for each environment that needs deployment trust.
 
 No deployment client secret is created.
 
