@@ -67,7 +67,7 @@ Recommended production controls:
 
 ## Automatic deployment guard
 
-Each normal code-deploy workflow has an Environment variable that must be `true` for push-driven deployment.
+Each normal code-deploy workflow has a **repository-level GitHub variable** that must be `true` for push-driven DEV deployment. Job-level conditions are evaluated before GitHub Environment-scoped values are loaded, so these guard flags deliberately live at repository scope.
 
 - `POWERAPPS_AUTO_DEPLOY`
 - `POWERPAGES_AUTO_DEPLOY`
