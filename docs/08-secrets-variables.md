@@ -10,7 +10,7 @@ Client IDs, tenant IDs, environment URLs, resource names and subscription IDs ar
 
 Client secrets, private certificates, deployment tokens and passwords are secrets.
 
-Prefer GitHub **Environment** values over repository-wide values so DEV/TEST/PROD can differ.
+Prefer GitHub **Environment** values over repository-wide values so DEV/TEST/PROD can differ. The four `*_AUTO_DEPLOY` guard flags are the exception: they are repository-level variables because GitHub evaluates the job guard before Environment-scoped variables are available.
 
 ---
 
