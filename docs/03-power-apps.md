@@ -6,6 +6,8 @@ Power Apps Code Apps allow a code-first SPA to be built with normal web tooling 
 
 This repository does not wrap React inside a Canvas App. The derived application becomes a real Code App.
 
+The shared web workspace includes the official Power Apps client library `@microsoft/power-apps` and enables `@microsoft/power-apps-vite` only for the `powerapps` Vite mode. Power Pages and Azure builds therefore keep the same source code without inheriting Power Apps host build behavior.
+
 ## Initialize a derived application
 
 From `apps/web`:
