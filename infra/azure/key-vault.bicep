@@ -1,6 +1,12 @@
 param location string
 param keyVaultName string
 
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param publicNetworkAccess string = 'Enabled'
+
 resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' = {
   name: keyVaultName
   location: location
@@ -9,7 +15,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2026-02-01' = {
     enableRbacAuthorization: true
     enablePurgeProtection: true
     softDeleteRetentionInDays: 90
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: publicNetworkAccess
     sku: {
       family: 'A'
       name: 'standard'
