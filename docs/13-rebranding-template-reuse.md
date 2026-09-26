@@ -9,7 +9,10 @@ Do not turn this generic repository into a customer-specific branch farm.
 ## Rebrand command
 
 ```bash
-npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
+npm run rebrand -- \
+  --name "Contoso Workspace" \
+  --scope "@contoso" \
+  --code-owner "@contoso/platform"
 ```
 
 The script updates repository-controlled naming such as:
@@ -19,7 +22,10 @@ The script updates repository-controlled naming such as:
 - web title;
 - starter screen;
 - Power Pages site-name default;
-- npm workspace scope.
+- npm workspace scope;
+- C# project/folder/namespace identifiers;
+- package lockfile package names;
+- `.github/CODEOWNERS` when `--code-owner` is supplied.
 
 ## What it deliberately does not rename
 
@@ -42,7 +48,7 @@ Those resources may already exist and can require migration rather than string r
 ## Recommended derived-repository sequence
 
 1. create repository from template;
-2. run rebrand;
+2. run rebrand with the owning GitHub user/team;
 3. review diff;
 4. decide target hosts;
 5. initialize Power Apps metadata if required;
