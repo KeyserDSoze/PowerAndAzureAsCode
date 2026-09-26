@@ -35,8 +35,10 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Restore locked dependencies
+        run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --locked-mode
       - name: Publish
-        run: dotnet publish src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release -o artifacts/api
+        run: dotnet publish src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj -c Release -o artifacts/api --no-restore
       - name: Deploy App Service
         uses: azure/webapps-deploy@v3
         with:
