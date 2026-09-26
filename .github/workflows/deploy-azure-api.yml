@@ -15,6 +15,10 @@ on:
       - "src/backends/azure-api/**"
       - ".github/workflows/deploy-azure-api.yml"
 
+concurrency:
+  group: azure-${{ inputs.environment || 'development' }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
@@ -23,6 +27,7 @@ jobs:
   deploy:
     if: ${{ github.event_name == 'workflow_dispatch' || vars.AZURE_API_AUTO_DEPLOY == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: ${{ inputs.environment || 'development' }}
     steps:
       - uses: actions/checkout@v5
