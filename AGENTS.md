@@ -47,22 +47,24 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 22. App Service reads Key Vault references through its Managed Identity; do not copy the Dataverse runtime secret into GitHub.
 23. Power Apps generated Dataverse services are client transports, not the authoritative backend.
 24. Cross-host business invariants belong in Dataverse Custom APIs/plugins under `src/backends/dataverse` unless an ADR explicitly selects another canonical backend.
+25. Dependency lockfiles are authoritative; CI/deploy workflows use `npm ci` and NuGet locked restore.
+26. The Azure API trusts `x-ms-client-principal` only as a linked Static Web Apps backend. Do not expose it behind anonymous App Service access without replacing the authentication design.
 
 ## Repository map
 
 ```text
 .github/workflows/                   CI/CD
-src/frontend/                            shared React SPA
-src/frontend/src/platform/               host adapters
-src/backends/powerpages/server-logic/             Server Logic examples
-src/backends/azure-api/                       ASP.NET Core .NET 10 API
-src/backends/dataverse/                       Dataverse Custom API plug-in backend
-src/backends/powerpages/                      Power Pages Server Logic
-infra/azure/                         Azure Bicep baseline: SWA, App Service, Key Vault, MI, Insights
-scripts/                             validation/rebranding/version helpers
-docs/                                runbooks and architecture
-docs/adr/                            architecture decisions
-brand.config.json                    boilerplate-controlled branding
+src/frontend/                       shared React SPA
+src/frontend/src/platform/          host adapters
+src/backends/azure-api/             ASP.NET Core .NET 10 API
+src/backends/dataverse/             Dataverse Custom API plug-in backend
+src/backends/powerpages/            Power Pages Server Logic templates
+src/hosting/azure/                  Static Web Apps host configuration
+infra/azure/                        Azure Bicep baseline: SWA, App Service, Key Vault, MI, Insights
+scripts/                            validation/rebranding/bootstrap helpers
+docs/                               runbooks and architecture
+docs/adr/                           architecture decisions
+brand.config.json                   boilerplate-controlled branding
 ```
 
 ## Host selection
