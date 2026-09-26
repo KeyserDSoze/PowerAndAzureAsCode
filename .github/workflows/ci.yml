@@ -114,7 +114,7 @@ jobs:
           global-json-file: global.json
       - run: npm ci --no-audit --no-fund
       - name: Rebrand a disposable checkout
-        run: npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
+        run: npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@contoso/platform"
       - name: Verify npm lock consistency after rebrand
         run: npm ci --no-audit --no-fund
       - run: npm run validate
@@ -130,6 +130,8 @@ jobs:
 
           test "${#azure_projects[@]}" -eq 1
           test "${#plugin_projects[@]}" -eq 1
+          grep -q "@contoso/platform" .github/CODEOWNERS
+          ! grep -q "@KeyserDSoze" .github/CODEOWNERS
 
           dotnet restore "${azure_projects[0]}" --locked-mode
           dotnet build "${azure_projects[0]}" -c Release --no-restore
