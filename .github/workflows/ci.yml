@@ -90,4 +90,9 @@ jobs:
           dotnet restore "${plugin_projects[0]}" --locked-mode
           dotnet build "${plugin_projects[0]}" -c Release --no-restore
 
-          test -z "$(grep -R --exclude-dir=.git --exclude=package-lock.json -l 'PowerAndAzureAsCode' src || true)"
+          test -z "$(grep -R \
+            --exclude-dir=bin \
+            --exclude-dir=obj \
+            --exclude-dir=dist \
+            --exclude=packages.lock.json \
+            -l 'PowerAndAzureAsCode' src || true)"
