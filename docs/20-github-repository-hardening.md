@@ -18,7 +18,7 @@ The repository should eventually have:
 - secret scanning/push protection where available;
 - Dependabot security updates enabled.
 
-GitHub Environments can enforce reviewers, branch restrictions and other deployment protection rules before secrets are made available to a job. citeturn318028search1turn318028search2
+GitHub Environments can enforce reviewers, branch restrictions and other deployment protection rules before secrets are made available to a job. See https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments.
 
 ## Bootstrap script
 
@@ -61,7 +61,7 @@ Configure the `production` Environment in GitHub Settings with:
 - deployment branch/tag rules;
 - environment variables/secrets.
 
-GitHub supports required reviewers and prevention of self-review as Environment protection rules. citeturn318028search1turn318028search2
+GitHub supports required reviewers and prevention of self-review as Environment protection rules. See https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments.
 
 ## CODEOWNERS
 
@@ -75,7 +75,7 @@ Do not enable `require_code_owner_reviews` until CODEOWNERS has been customized 
 
 The bootstrap uses the branch-protection API because it is widely available and simple to automate.
 
-Organizations that centrally manage GitHub should normally prefer organization/repository rulesets. Rulesets can layer with classic branch protection, and the most restrictive applicable rules are enforced. citeturn129561search6
+Organizations that centrally manage GitHub should normally prefer organization/repository rulesets. Rulesets can layer with classic branch protection, and the most restrictive applicable rules are enforced. See https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets.
 
 Useful ruleset options include:
 
@@ -83,13 +83,15 @@ Useful ruleset options include:
 - require status checks;
 - block force pushes;
 - require code scanning results;
-- require secret-scanning alerts to be resolved. citeturn129561search0
+- require secret-scanning alerts to be resolved.
+
+Reference: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.
 
 If organization rulesets already provide those controls, do not duplicate stricter repository rules without reviewing the combined effect.
 
 ## Required status check naming
 
-GitHub Actions status checks use the job name as the required-check context. citeturn129561search5
+GitHub Actions status checks use the job name as the required-check context. See https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/troubleshooting-rules.
 
 The boilerplate therefore keeps stable CI job names. Renaming a required CI job requires updating branch protection/rulesets at the same time.
 
