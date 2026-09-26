@@ -44,7 +44,7 @@ npm install --global @microsoft/power-apps
 ```bash
 git clone <derived-repository>
 cd <derived-repository>
-npm install
+npm ci
 npm run validate
 npm run build:powerapps
 npm run build:powerpages
