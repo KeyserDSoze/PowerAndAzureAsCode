@@ -14,7 +14,7 @@
 ## Validation commands
 
 ```bash
-npm install
+npm ci
 npm run validate
 npm run build:powerapps
 npm run build:powerpages
