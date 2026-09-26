@@ -90,6 +90,7 @@ POWERPLATFORM_DEPLOY_CLIENT_ID
 POWERPLATFORM_DEPLOY_ENVIRONMENT_URL
 POWERPLATFORM_SOLUTION_PATH
 POWERPLATFORM_SOLUTION_PACKAGE_TYPE
+POWERPLATFORM_SOLUTION_SETTINGS_FILE
 ```
 
 `POWERPLATFORM_SOLUTION_PATH` defaults to:
@@ -109,6 +110,8 @@ or:
 ```text
 managed
 ```
+
+`POWERPLATFORM_SOLUTION_SETTINGS_FILE` is optional. When configured, it must point to a committed PAC deployment settings JSON file for the target GitHub Environment. Use it for environment variables and connection references that differ between environments. Generate the initial file with `pac solution create-settings`, review it, and commit only non-secret deployment values; secret values should follow the product's secure injection strategy.
 
 Repository-level automatic deployment guard:
 
