@@ -10,7 +10,7 @@ Client IDs, tenant IDs, environment URLs, resource names and subscription IDs ar
 
 Client secrets, private certificates, deployment tokens and passwords are secrets.
 
-Prefer GitHub **Environment** values over repository-wide values so DEV/TEST/PROD can differ. The four `*_AUTO_DEPLOY` guard flags are the exception: they are repository-level variables because GitHub evaluates the job guard before Environment-scoped variables are available.
+Prefer GitHub **Environment** values over repository-wide values so DEV/TEST/PROD can differ. The `*_AUTO_DEPLOY` guard flags are the exception: they are repository-level variables because GitHub evaluates the job guard before Environment-scoped variables are available.
 
 ---
 
@@ -176,6 +176,10 @@ Resource group containing the product resources.
 Azure region used by the infrastructure deployment.
 
 Examples depend on customer/region policy; do not hard-code a universal region in the template.
+
+#### `AZURE_STATIC_WEB_APP_LOCATION`
+
+Optional Static Web Apps resource region. If omitted, the infrastructure workflow falls back to `AZURE_LOCATION`. Use this when the selected backend region isn't available for Static Web Apps.
 
 #### `AZURE_STATIC_WEB_APP_NAME`
 
