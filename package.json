@@ -15,7 +15,7 @@
     "version:write": "node scripts/write-version.mjs",
     "rebrand": "node scripts/rebrand.mjs",
     "test:tooling": "node --test scripts/*.test.mjs",
-    "test:platform": "node --experimental-strip-types --test src/frontend/src/platform/operations.test.ts",
+    "test:platform": "node --experimental-strip-types --test tests/frontend-platform/operations.test.ts",
     "configure:powerapps-ping": "node scripts/configure-powerapps-boilerplate-ping.mjs"
   },
   "engines": {
