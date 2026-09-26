@@ -1,0 +1,49 @@
+name: Materialize Lockfiles
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/materialize-lockfiles.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  lockfiles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Generate npm lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Generate Azure API NuGet lockfile
+        run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --use-lock-file
+
+      - name: Generate Dataverse plug-in NuGet lockfile
+        run: dotnet restore src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj --use-lock-file
+
+      - name: Commit lockfiles
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git add src/backends/azure-api/PowerAndAzureAsCode.Api/packages.lock.json
+          git add src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/packages.lock.json
+
+          if git diff --cached --quiet; then
+            echo "Lockfiles already current."
+            exit 0
+          fi
+
+          git commit -m "build: add deterministic dependency lockfiles"
+          git push origin HEAD:main
