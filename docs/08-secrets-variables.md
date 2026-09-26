@@ -47,7 +47,7 @@ Optional.
 Power Platform Solution ID used when publishing the Code App into a solution:
 
 ```bash
-pa app push --solution-id <value>
+npx --no-install pa app push --solution-id <value>
 ```
 
 Leave empty if the application is not being pushed into a solution.
@@ -92,7 +92,7 @@ Never write this into `power.config.json`.
 The **Enterprise Application object ID** is needed when a maker shares edit access with the deployment service principal:
 
 ```bash
-pa app share --principal <enterprise-application-object-id> --access edit
+npx --no-install pa app share --principal <enterprise-application-object-id> --access edit
 ```
 
 Do not confuse this with the App Registration object ID.
