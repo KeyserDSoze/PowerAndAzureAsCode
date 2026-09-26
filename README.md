@@ -74,7 +74,7 @@ dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.
 Before starting a real application:
 
 ```bash
-npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
+npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@contoso/platform"
 ```
 
 ## Deployment
