@@ -30,7 +30,7 @@ jobs:
         run: az group create --name "${{ vars.AZURE_RESOURCE_GROUP }}" --location "${{ vars.AZURE_LOCATION }}"
       - name: Deploy Bicep
         run: |
-          az deployment group create             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --template-file infra/azure/main.bicep             --parameters               staticWebAppName="${{ vars.AZURE_STATIC_WEB_APP_NAME }}"               apiWebAppName="${{ vars.AZURE_API_WEBAPP_NAME }}"               keyVaultName="${{ vars.AZURE_KEY_VAULT_NAME }}"               logAnalyticsWorkspaceName="${{ vars.AZURE_LOG_ANALYTICS_WORKSPACE_NAME }}"               appInsightsName="${{ vars.AZURE_APP_INSIGHTS_NAME }}"               location="${{ vars.AZURE_LOCATION }}"
+          az deployment group create             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --template-file infra/azure/main.bicep             --parameters               staticWebAppName="${{ vars.AZURE_STATIC_WEB_APP_NAME }}"               apiWebAppName="${{ vars.AZURE_API_WEBAPP_NAME }}"               keyVaultName="${{ vars.AZURE_KEY_VAULT_NAME }}"               logAnalyticsWorkspaceName="${{ vars.AZURE_LOG_ANALYTICS_WORKSPACE_NAME }}"               appInsightsName="${{ vars.AZURE_APP_INSIGHTS_NAME }}"               location="${{ vars.AZURE_LOCATION }}"               staticWebAppLocation="${{ vars.AZURE_STATIC_WEB_APP_LOCATION || vars.AZURE_LOCATION }}"
       - name: Link App Service backend to Static Web App
         shell: bash
         run: |
