@@ -146,6 +146,11 @@ for environment in test production; do
 JSON
 done
 
+echo "Verifying applied repository baseline..."
+bash "$(dirname "${BASH_SOURCE[0]}")/verify-github-repository.sh" \
+  --repository "$REPOSITORY" \
+  --branch "$BRANCH"
+
 cat <<EOF
 
 GitHub repository baseline configured.
