@@ -16,6 +16,7 @@
     "react-dom": "^19.1.1"
   },
   "devDependencies": {
+    "@microsoft/power-apps-cli": "1.0.2",
     "@microsoft/power-apps-vite": "^1.0.2",
     "@types/node": "^24.5.2",
     "@types/react": "^19.1.13",
