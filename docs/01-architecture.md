@@ -14,11 +14,13 @@ React UI / routes / state / use-cases
       |          |          |
  Power Apps  Power Pages   Azure
       |          |          |
- connectors  Server Logic  /api
-      |          |          |
+ generated   Server Logic  /api
+  client         |          |
       +----------+----------+
                  |
-              Dataverse
+        Dataverse application surface
+          |                 |
+    simple CRUD      Custom APIs/plugins
 ```
 
 ## Shared code
