@@ -15,6 +15,10 @@ on:
       - "src/backends/dataverse/**"
       - ".github/workflows/deploy-powerplatform-solution.yml"
 
+concurrency:
+  group: powerplatform-${{ inputs.environment || 'development' }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
@@ -23,6 +27,7 @@ jobs:
   deploy:
     if: ${{ github.event_name == 'workflow_dispatch' || vars.POWERPLATFORM_SOLUTION_AUTO_DEPLOY == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     environment: ${{ inputs.environment || 'development' }}
     env:
       SOLUTION_ROOT: ${{ vars.POWERPLATFORM_SOLUTION_PATH || 'src/backends/dataverse/solution' }}
