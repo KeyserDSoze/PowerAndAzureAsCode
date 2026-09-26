@@ -109,3 +109,10 @@ For the complete Azure/Entra/Dataverse bootstrap, follow [docs/17-identity-boots
 Power Apps generated Dataverse services are client transports; shared authoritative business operations belong in `src/backends/dataverse` as Dataverse Custom APIs/plug-ins.
 
 See [docs/README.md](docs/README.md) for the full documentation index.
+
+
+## Licensing
+
+This repository currently does **not** declare an open-source license.
+
+Before distributing or reusing a derived product outside the owning organization, select the appropriate organization-approved license or proprietary notice. A public GitHub repository by itself does not define reuse rights.
