@@ -1,6 +1,6 @@
 # Microsoft references
 
-Last reviewed for this boilerplate: **2026-09-25**.
+Last reviewed for this boilerplate: **2026-09-26**.
 
 Microsoft platform behavior changes. Re-check these sources before material platform upgrades.
 
@@ -8,6 +8,7 @@ Microsoft platform behavior changes. Re-check these sources before material plat
 
 - Quickstart: https://learn.microsoft.com/power-apps/developer/code-apps/how-to/npm-quickstart
 - Power Apps CLI: https://learn.microsoft.com/power-apps/developer/code-apps/reference/cli
+- Dataverse actions/functions in Code Apps: https://learn.microsoft.com/power-apps/developer/code-apps/how-to/add-dataverse-action-function
 - Service-principal publishing: https://learn.microsoft.com/power-apps/developer/code-apps/how-to/use-service-principal
 
 ## Power Pages Code Sites / Server Logic
@@ -22,6 +23,7 @@ Microsoft platform behavior changes. Re-check these sources before material plat
 
 - Authentication/authorization: https://learn.microsoft.com/azure/static-web-apps/authentication-authorization
 - App Service linked backend: https://learn.microsoft.com/azure/static-web-apps/apis-app-service
+- Static Web Apps backend CLI: https://learn.microsoft.com/cli/azure/staticwebapp/backends
 - User information / x-ms-client-principal: https://learn.microsoft.com/azure/static-web-apps/user-information
 - Build/deploy configuration: https://learn.microsoft.com/azure/static-web-apps/build-configuration
 - Deployment tokens: https://learn.microsoft.com/azure/static-web-apps/deployment-token-management
