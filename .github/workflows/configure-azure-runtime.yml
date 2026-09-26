@@ -10,6 +10,10 @@ on:
         options: [development, test, production]
         default: development
 
+concurrency:
+  group: azure-${{ inputs.environment || 'development' }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
   id-token: write
@@ -17,6 +21,7 @@ permissions:
 jobs:
   configure:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     environment: ${{ inputs.environment }}
     env:
       DATAVERSE_SECRET_NAME: ${{ vars.DATAVERSE_SECRET_NAME || 'dataverse-client-secret' }}
