@@ -2,7 +2,9 @@
   "name": "power-and-azure-as-code",
   "private": true,
   "version": "0.0.1",
-  "workspaces": ["src/frontend"],
+  "workspaces": [
+    "src/frontend"
+  ],
   "scripts": {
     "dev": "npm --workspace @powerandazure/web run dev",
     "build": "npm run build:azure",
@@ -11,7 +13,8 @@
     "build:azure": "npm --workspace @powerandazure/web run build:azure && node scripts/render-staticwebapp-config.mjs && node scripts/write-version.mjs",
     "validate": "node scripts/validate-config.mjs",
     "version:write": "node scripts/write-version.mjs",
-    "rebrand": "node scripts/rebrand.mjs"
+    "rebrand": "node scripts/rebrand.mjs",
+    "test:tooling": "node --test scripts/*.test.mjs"
   },
   "engines": {
     "node": ">=22"
