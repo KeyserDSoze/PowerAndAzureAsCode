@@ -116,7 +116,7 @@ Read `docs/08-secrets-variables.md` before modifying workflows. Tenant IDs, clie
 ## Validation
 
 ```bash
-npm install
+npm ci
 npm run validate
 npm run build:powerapps
 npm run build:powerpages
