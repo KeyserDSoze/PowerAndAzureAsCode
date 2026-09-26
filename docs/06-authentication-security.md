@@ -71,7 +71,9 @@ The Static Web App must require the `authenticated` role for application routes.
 
 For single-tenant enterprise scenarios, replace the broad preconfigured provider behavior with a custom Entra provider scoped to the intended tenant.
 
-The linked backend must stay linked/protected. Do not later change App Service authentication to allow arbitrary anonymous internet calls without adding an equivalent API authentication design.
+The linked backend must stay linked/protected. The App Service is publicly reachable at the network layer for the SWA proxy integration, but the `Azure Static Web Apps (Linked)` App Service authentication provider restricts access to traffic proxied by the linked Static Web App by default.
+
+Do not later remove/relax that App Service authentication or add anonymous direct access without an explicit API authentication design. If a customer requires private network isolation, use a different backend topology rather than treating the linked-SWA model as a private endpoint solution.
 
 ## Azure Key Vault and Managed Identity
 
