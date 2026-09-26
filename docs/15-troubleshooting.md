@@ -15,7 +15,7 @@ If `npm ci` reports that `package.json` and `package-lock.json` are out of sync,
 Run from `src/frontend`:
 
 ```bash
-pa app init --display-name "<app-name>" --environment-id <environment-id>
+npx --no-install pa app init --display-name "<app-name>" --environment-id <environment-id>
 ```
 
 Review and commit the generated metadata in the derived product repository.
