@@ -1,6 +1,9 @@
 @description('Azure region for App Service, Key Vault and observability resources.')
 param location string = resourceGroup().location
 
+@description('Azure region used by the Static Web App resource. Can differ from the backend region.')
+param staticWebAppLocation string = location
+
 @description('Globally unique Azure Static Web App name.')
 param staticWebAppName string
 
@@ -47,7 +50,7 @@ module appService './app-service.bicep' = {
 
 resource staticWebApp 'Microsoft.Web/staticSites@2023-12-01' = {
   name: staticWebAppName
-  location: location
+  location: staticWebAppLocation
   sku: {
     name: 'Standard'
     tier: 'Standard'
