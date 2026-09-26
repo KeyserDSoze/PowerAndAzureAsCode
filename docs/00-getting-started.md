@@ -35,8 +35,6 @@ Power Apps target:
 Install Power Apps CLI locally when needed:
 
 ```bash
-npm install --global @microsoft/power-apps-cli
-npm install --global @microsoft/power-apps
 ```
 
 ## First bootstrap
@@ -78,8 +76,8 @@ For a Power Apps Code App, use the Power Apps local host after initializing the 
 
 ```bash
 cd src/frontend
-pa app init --display-name "Contoso Workspace" --environment-id <environment-id>
-pa app run
+npx --no-install pa app init --display-name "Contoso Workspace" --environment-id <environment-id>
+npx --no-install pa app run
 ```
 
 For Power Pages, regular Vite development is useful for UI work, but Power Pages session, CSRF and Server Logic behavior must be validated in the real Code Site.
