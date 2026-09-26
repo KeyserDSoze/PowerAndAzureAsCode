@@ -27,6 +27,7 @@ jobs:
     env:
       SOLUTION_ROOT: ${{ vars.POWERPLATFORM_SOLUTION_PATH || 'src/backends/dataverse/solution' }}
       PACKAGE_TYPE: ${{ vars.POWERPLATFORM_SOLUTION_PACKAGE_TYPE || 'unmanaged' }}
+      SETTINGS_FILE: ${{ vars.POWERPLATFORM_SOLUTION_SETTINGS_FILE }}
     steps:
       - uses: actions/checkout@v5
 
@@ -98,9 +99,21 @@ jobs:
       - name: Import solution
         shell: bash
         run: |
+          set -euo pipefail
+
+          settings_args=()
+          if [ -n "$SETTINGS_FILE" ]; then
+            test -f "$SETTINGS_FILE" || {
+              echo "Power Platform deployment settings file not found: $SETTINGS_FILE" >&2
+              exit 1
+            }
+            settings_args+=(--settings-file "$SETTINGS_FILE")
+          fi
+
           pac solution import \
             --path "${{ steps.package.outputs.path }}" \
             --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}" \
             --activate-plugins \
             --publish-changes \
-            --async
+            --async \
+            "${settings_args[@]}"
