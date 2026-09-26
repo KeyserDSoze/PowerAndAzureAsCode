@@ -82,6 +82,7 @@ npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
 | Azure infrastructure | `deploy-azure-infra.yml` | Azure OIDC/FIC |
 | Azure runtime configuration | `configure-azure-runtime.yml` | Azure OIDC/FIC |
 | Dataverse Application User bootstrap | `bootstrap-dataverse-application-user.yml` | Power Platform OIDC/FIC |
+| Dataverse solution | `deploy-powerplatform-solution.yml` | Power Platform OIDC/FIC |
 
 Fresh template repositories do **not** deploy automatically until the relevant `*_AUTO_DEPLOY` repository-level GitHub variable is explicitly enabled. Manual deployments remain available.
 
