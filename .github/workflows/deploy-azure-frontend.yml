@@ -17,6 +17,10 @@ on:
       - "scripts/**"
       - ".github/workflows/deploy-azure-frontend.yml"
 
+concurrency:
+  group: azure-${{ inputs.environment || 'development' }}
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -24,6 +28,7 @@ jobs:
   deploy:
     if: ${{ github.event_name == 'workflow_dispatch' || vars.AZURE_FRONTEND_AUTO_DEPLOY == 'true' }}
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     environment: ${{ inputs.environment || 'development' }}
     env:
       SWA_AUTH_MODE: ${{ vars.AZURE_SWA_AUTH_MODE || 'preconfigured' }}
