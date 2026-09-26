@@ -33,6 +33,10 @@ bash scripts/bootstrap-github-repository.sh \
 
 The script uses GitHub CLI and configures:
 
+- the repository template setting;
+- automatic deletion of merged branches;
+- auto-merge and update-branch support;
+
 - required checks:
   - `tooling`
   - `frontend`
