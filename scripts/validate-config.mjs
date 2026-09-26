@@ -24,6 +24,7 @@ const requiredFiles = [
   "scripts/bootstrap-powerplatform-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-solution.sh",
   "scripts/bootstrap-github-repository.sh",
+  "scripts/verify-github-repository.sh",
   "scripts/install-powerpages-server-logic-example.mjs",
   "docs/20-github-repository-hardening.md",
   ".github/workflows/deploy-powerplatform-solution.yml",
