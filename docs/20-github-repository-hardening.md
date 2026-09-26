@@ -2,6 +2,8 @@
 
 This runbook covers repository-level governance that is intentionally not encoded in application source.
 
+The scripts and this document describe the **desired baseline**. They do not prove that the live GitHub repository currently matches it. Repository/organization administrators may intentionally apply different rulesets, and settings can drift after bootstrap.
+
 ## Current boilerplate expectation
 
 The repository should eventually have:
@@ -53,6 +55,16 @@ The script uses GitHub CLI and configures:
 - deployment environments.
 
 The number of approvals is explicit because a solo repository and an enterprise repository have different governance needs.
+
+The bootstrap finishes by running the repository verifier. You can also run it independently:
+
+```bash
+bash scripts/verify-github-repository.sh \
+  --repository owner/repository \
+  --branch main
+```
+
+The verifier checks template/merge settings plus the expected branch-protection checks. It requires a GitHub identity with enough administration read access to inspect branch protection. If organization rulesets intentionally replace the classic branch-protection baseline, review the verifier expectations instead of blindly applying duplicate rules.
 
 ## Production reviewers
 
@@ -122,3 +134,4 @@ The committed Dependabot configuration handles routine version updates; reposito
 7. Verify a test PR cannot merge until required checks pass.
 8. Verify production deployment stops for approval where configured.
 9. Verify force push/delete of `main` is blocked.
+10. Run `scripts/verify-github-repository.sh` and resolve or explicitly document any intended drift.
