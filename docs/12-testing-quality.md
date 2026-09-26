@@ -13,7 +13,12 @@ CI validates:
 - a disposable checkout is fully rebranded and rebuilt as a template smoke test;
 - Bicep compiles;
 - CodeQL analyzes TypeScript/JavaScript and C#;
-- Dependabot tracks npm, NuGet and GitHub Actions.
+- Dependabot tracks npm, NuGet and GitHub Actions;
+- repository-tooling regression tests verify forbidden citation scanning;
+- Node's TypeScript-capable test runner verifies shared host response contracts;
+- a dependency-free .NET smoke executable verifies Static Web Apps principal parsing, including rejection of malformed headers and filtering the anonymous role.
+
+These template-owned tests intentionally avoid a deployed tenant. Environment integration tests remain the responsibility of derived products.
 
 ## Derived application tests
 
