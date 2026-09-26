@@ -43,11 +43,23 @@ config.npmScope = scope;
 await writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
 
 const displayFiles = [
-  "README.md",
   "src/frontend/index.html",
   "src/frontend/src/App.tsx",
   "src/frontend/powerpages.config.json"
 ];
+
+const readmePath = resolve("README.md");
+let readme = await readFile(readmePath, "utf8");
+readme = readme.replace(
+  new RegExp("^# " + oldDisplayName.replace(/[.*+?^$()|[\\]\\]/g, "\\const displayFiles = [
+  "README.md",
+  "src/frontend/index.html",
+  "src/frontend/src/App.tsx",
+  "src/frontend/powerpages.config.json"
+];") + "$", "m"),
+  "# " + displayName
+);
+await writeFile(readmePath, readme);
 
 for (const file of displayFiles) {
   const path = resolve(file);
