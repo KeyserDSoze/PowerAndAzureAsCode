@@ -3,6 +3,13 @@ import { resolve } from "node:path";
 
 const requiredFiles = [
   "brand.config.json",
+  "src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/packages.lock.json",
+  "src/backends/azure-api/PowerAndAzureAsCode.Api/packages.lock.json",
+  "docs/20-github-repository-hardening.md",
+  "scripts/bootstrap-github-repository.sh",
+  "global.json",
+  ".node-version",
+  "package-lock.json",
   "src/frontend/.env.powerapps",
   "src/frontend/.env.powerpages",
   "src/frontend/.env.azure",
