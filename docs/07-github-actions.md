@@ -133,3 +133,45 @@ Derived products should bump version for releases. `scripts/write-version.mjs` w
 ## Privileged bootstrap scripts
 
 Creation of Entra app registrations is intentionally not performed by normal CI. Tenant administrators use the scripts documented in `17-identity-bootstrap.md`, then GitHub Actions operate with OIDC/FIC and least-privilege runtime identities.
+
+
+## Concurrency
+
+Deployment workflows use environment-scoped concurrency groups.
+
+- Azure workflows share the `azure-<environment>` group.
+- Power Platform/Power Apps/Power Pages workflows share the `powerplatform-<environment>` group.
+- active deployments are not cancelled when a newer run is queued;
+- CI and CodeQL cancel superseded runs for the same ref.
+
+This prevents overlapping infrastructure/application changes in the same target environment.
+
+## GitHub Actions supply chain
+
+External GitHub Actions are pinned to immutable 40-character commit SHAs. The major version remains in an inline comment for readability.
+
+Dependabot is configured for the `github-actions` ecosystem and can propose updates to those pinned commits.
+
+Do not replace SHA pins with mutable `@vN` tags in a derived repository unless the organization explicitly accepts that supply-chain trade-off.
+
+## Repository bootstrap
+
+Run:
+
+```bash
+bash scripts/bootstrap-github-repository.sh \
+  --repository owner/repository \
+  --branch main \
+  --approvals 1
+```
+
+with a GitHub administrator identity to:
+
+- mark the repository as a template;
+- enable branch cleanup after merge;
+- enable auto-merge/update-branch support;
+- protect `main`;
+- require CI checks;
+- create the deployment Environments.
+
+See `20-github-repository-hardening.md`.
