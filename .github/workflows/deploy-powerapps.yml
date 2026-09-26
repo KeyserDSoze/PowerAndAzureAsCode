@@ -36,7 +36,9 @@ jobs:
         with:
           node-version: 22
       - run: npm ci --no-audit --no-fund
-      - run: npm install --global @microsoft/power-apps-cli @microsoft/power-apps
+      - name: Verify locked Power Apps CLI
+        working-directory: src/frontend
+        run: npx --no-install pa --version
       - run: npm run build:powerapps
       - name: Validate initialized Code App
         run: test -f src/frontend/power.config.json || (echo "Run 'pa app init' in src/frontend and commit power.config.json in the derived application repository." && exit 1)
@@ -45,7 +47,7 @@ jobs:
         shell: bash
         run: |
           if [ -n "$POWERAPPS_SOLUTION_ID" ]; then
-            pa app push --non-interactive --solution-id "$POWERAPPS_SOLUTION_ID"
+            npx --no-install pa app push --non-interactive --solution-id "$POWERAPPS_SOLUTION_ID"
           else
-            pa app push --non-interactive
+            npx --no-install pa app push --non-interactive
           fi
