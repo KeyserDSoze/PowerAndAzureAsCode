@@ -16,3 +16,12 @@ dt { font-weight: 700; }
 dd { margin: 0; overflow-wrap: anywhere; }
 .hint { color: #4b5563; }
 .error { color: #b91c1c; font-weight: 600; }
+
+h2 { margin-bottom: .5rem; font-size: 1.15rem; }
+.operation { margin: 2rem 0; padding-top: 1.5rem; border-top: 1px solid #e5e7eb; }
+.operation label { display: block; margin: 1rem 0 .4rem; font-weight: 700; }
+.operation-row { display: flex; gap: .75rem; align-items: stretch; }
+.operation-row input { flex: 1; min-width: 0; padding: .7rem .85rem; border: 1px solid #cbd5e1; border-radius: 8px; font: inherit; }
+.operation-row button { padding: .7rem 1rem; border: 0; border-radius: 8px; font: inherit; font-weight: 700; cursor: pointer; }
+.operation-row button:disabled { cursor: wait; opacity: .65; }
+@media (max-width: 560px) { .operation-row { flex-direction: column; } }
