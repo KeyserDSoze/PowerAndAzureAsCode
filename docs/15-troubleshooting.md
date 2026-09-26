@@ -1,14 +1,14 @@
 # Troubleshooting
 
-## CI: npm cache complains about missing lock file
+## CI: npm lockfile mismatch
 
-This template may initially be copied before the derived application has generated its own lock file. Run:
+The template commits `package-lock.json` and CI uses:
 
 ```bash
-npm install
+npm ci
 ```
 
-and commit the generated `package-lock.json` in the derived repository. Once present, prefer `npm ci` in stricter product pipelines.
+If `npm ci` reports that `package.json` and `package-lock.json` are out of sync, update dependencies intentionally with npm, review the lockfile diff, and commit both files together. Do not switch CI back to floating `npm install`.
 
 ## Power Apps workflow says power.config.json is missing
 
@@ -112,5 +112,6 @@ Set the correct repository-level variable to the literal `true`:
 - `POWERPAGES_AUTO_DEPLOY`
 - `AZURE_FRONTEND_AUTO_DEPLOY`
 - `AZURE_API_AUTO_DEPLOY`
+- `POWERPLATFORM_SOLUTION_AUTO_DEPLOY`
 
 Or run the workflow manually.
