@@ -9,9 +9,18 @@ const valueAfter = (flag) => {
 
 const displayName = valueAfter("--name");
 const scope = valueAfter("--scope");
+const codeOwner = valueAfter("--code-owner");
 
 if (!displayName || !scope || !scope.startsWith("@")) {
-  console.error('Usage: npm run rebrand -- --name "Product Name" --scope "@company"');
+  console.error('Usage: npm run rebrand -- --name "Product Name" --scope "@company" [--code-owner "@user-or-org/team"]');
+  process.exit(1);
+}
+
+if (
+  codeOwner &&
+  !/^@[A-Za-z0-9_.-]+(?:\/[A-Za-z0-9_.-]+)?$/.test(codeOwner)
+) {
+  console.error('--code-owner must look like "@user" or "@org/team".');
   process.exit(1);
 }
 
@@ -64,6 +73,13 @@ readme = readme.replace(
   `# ${displayName}\n`
 );
 await writeFile(readmePath, readme);
+
+if (codeOwner) {
+  const codeOwnersPath = resolve(".github/CODEOWNERS");
+  let codeOwners = await readFile(codeOwnersPath, "utf8");
+  codeOwners = codeOwners.replaceAll("@KeyserDSoze", codeOwner);
+  await writeFile(codeOwnersPath, codeOwners);
+}
 
 const ignoredDirectories = new Set([
   ".git",
@@ -166,5 +182,10 @@ await renameMatchingPaths(resolve("src"));
 console.log(`Display name: ${displayName}`);
 console.log(`Code identifier: ${newCodeName}`);
 console.log(`npm scope: ${scope}`);
+if (codeOwner) {
+  console.log(`CODEOWNERS: ${codeOwner}`);
+} else {
+  console.log("CODEOWNERS unchanged; replace .github/CODEOWNERS in the derived repository.");
+}
 console.log("Repository-controlled source names and project paths updated.");
 console.log("External Entra, Power Platform, Azure, GitHub and existing .powerpages-site resources were NOT renamed.");
