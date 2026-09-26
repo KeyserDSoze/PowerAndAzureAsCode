@@ -35,11 +35,11 @@ jobs:
 
       - name: Restore Azure API
         if: matrix.language == 'csharp'
-        run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj
+        run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --locked-mode
 
       - name: Restore Dataverse plug-in
         if: matrix.language == 'csharp'
-        run: dotnet restore src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj
+        run: dotnet restore src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj --locked-mode
 
       - name: Build Azure API for CodeQL
         if: matrix.language == 'csharp'
