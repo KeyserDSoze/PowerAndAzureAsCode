@@ -65,7 +65,7 @@ It creates:
 - Log Analytics workspace;
 - workspace-based Application Insights.
 
-The infrastructure workflow links the backend after provisioning and configures Application Insights for the API.
+The infrastructure workflow links the backend after provisioning, runs `az staticwebapp backends validate`, displays the linked backend, and configures Application Insights for the API. The validation step makes the linked-backend trust assumption an explicit deployment check rather than an undocumented prerequisite.
 
 ## Frontend deployment
 
@@ -111,6 +111,12 @@ No Azure client secret is required for the GitHub deployment identity when OIDC 
 - `AZURE_KEY_VAULT_NAME`
 - `AZURE_LOG_ANALYTICS_WORKSPACE_NAME`
 - `AZURE_APP_INSIGHTS_NAME`
+- `AZURE_APP_SERVICE_SKU_NAME` (optional; defaults to `B1`)
+- `AZURE_APP_SERVICE_SKU_TIER` (optional; defaults to `Basic`)
+- `AZURE_APP_SERVICE_PLAN_CAPACITY` (optional; defaults to `1`)
+- `AZURE_KEY_VAULT_PUBLIC_NETWORK_ACCESS` (optional; `Enabled` or `Disabled`, defaults to `Enabled`)
+
+The B1 defaults are a low-cost development baseline, not a universal production recommendation. Set the SKU/tier/capacity explicitly in production according to workload and organization policy.
 
 The deployment principal needs appropriate Azure RBAC on the resource group/subscription scope.
 
@@ -121,6 +127,7 @@ Configure on App Service:
 - `Dataverse__Url`
 - `Dataverse__ClientId`
 - `Dataverse__ClientSecret`
+- `Dataverse__BoilerplatePingApiName` for the neutral cross-host example
 
 The default runtime path uses an App Service Key Vault reference resolved through the App Service Managed Identity.
 
