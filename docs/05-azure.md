@@ -105,6 +105,7 @@ No Azure client secret is required for the GitHub deployment identity when OIDC 
 - `AZURE_SUBSCRIPTION_ID`
 - `AZURE_RESOURCE_GROUP`
 - `AZURE_LOCATION`
+- `AZURE_STATIC_WEB_APP_LOCATION` (optional; falls back to `AZURE_LOCATION`)
 - `AZURE_STATIC_WEB_APP_NAME`
 - `AZURE_API_WEBAPP_NAME`
 - `AZURE_KEY_VAULT_NAME`
