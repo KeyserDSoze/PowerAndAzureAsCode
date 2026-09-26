@@ -293,6 +293,7 @@ The Dataverse solution deployment workflow uses GitHub Environment variables:
 - `POWERPLATFORM_DEPLOY_ENVIRONMENT_URL`
 - `POWERPLATFORM_SOLUTION_PATH` (optional; defaults to `src/backends/dataverse/solution`)
 - `POWERPLATFORM_SOLUTION_PACKAGE_TYPE` (optional; `managed` or `unmanaged`)
+- `POWERPLATFORM_SOLUTION_SETTINGS_FILE` (optional repository-relative path to a PAC deployment settings JSON file)
 
 Repository-level deployment guard:
 
