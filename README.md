@@ -113,6 +113,16 @@ Power Apps generated Dataverse services are client transports; shared authoritat
 See [docs/README.md](docs/README.md) for the full documentation index.
 
 
+## Final owner readiness
+
+Before treating a derived repository as production-ready, complete these owner-level checks:
+
+- run `scripts/bootstrap-github-repository.sh` and then `scripts/verify-github-repository.sh` with a GitHub identity that can read/apply repository administration settings;
+- make an explicit licensing decision (approved open-source license or proprietary notice) rather than assuming a public repository grants reuse rights;
+- validate the neutral `BoilerplatePing` slice in a real DEV environment through every host you intend to support: Power Apps, Power Pages and/or Azure.
+
+These are deliberately not auto-completed by the generic template because they depend on repository administration, legal/owner policy and real tenant resources.
+
 ## Licensing
 
 This repository currently does **not** declare an open-source license.

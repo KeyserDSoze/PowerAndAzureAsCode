@@ -32,9 +32,10 @@ Power Apps target:
 - npm Power Apps CLI.
 - Power Apps Code Apps enabled in the environment.
 
-Install Power Apps CLI locally when needed:
+Install the npm-based Power Apps CLI when needed:
 
 ```bash
+npm install --global @microsoft/power-apps-cli
 ```
 
 ## First bootstrap
@@ -111,3 +112,26 @@ dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.
 ```
 
 Then follow the target-specific guide.
+
+## Final owner readiness
+
+After the code/bootstrap checks are green, three items still require an explicit owner action:
+
+1. **GitHub governance:** run the repository bootstrap and verifier with an administrator-capable GitHub identity:
+
+   ```bash
+   bash scripts/bootstrap-github-repository.sh \
+     --repository owner/repository \
+     --branch main \
+     --approvals 1
+
+   bash scripts/verify-github-repository.sh \
+     --repository owner/repository \
+     --branch main
+   ```
+
+2. **Licensing:** select the organization-approved open-source license or proprietary notice. Do not infer reuse rights from repository visibility.
+
+3. **Real DEV smoke test:** deploy the neutral `BoilerplatePing` example to a real DEV environment and verify every host the product will actually support reaches the same Dataverse Custom API/plugin.
+
+When those three owner-level checks are complete, stop extending the template and start building product-specific features.
