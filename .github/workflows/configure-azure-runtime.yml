@@ -27,7 +27,7 @@ jobs:
       DATAVERSE_SECRET_NAME: ${{ vars.DATAVERSE_SECRET_NAME || 'dataverse-client-secret' }}
     steps:
       - name: Azure login with OIDC
-        uses: azure/login@v3
+        uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         with:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
