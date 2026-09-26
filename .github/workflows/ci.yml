@@ -13,6 +13,48 @@ permissions:
   contents: read
 
 jobs:
+
+  tooling:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version-file: .node-version
+      - name: Validate shell syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            bash -n "$file"
+          done < <(find scripts -type f -name '*.sh' -print0)
+      - name: Validate Node script syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            node --check "$file"
+          done < <(find scripts -type f -name '*.mjs' -print0)
+      - name: Validate tracked JSON
+        shell: bash
+        run: |
+          set -euo pipefail
+          node <<'NODE'
+          const { execFileSync } = require("node:child_process");
+          const fs = require("node:fs");
+
+          const files = execFileSync("git", ["ls-files", "*.json"], { encoding: "utf8" })
+            .split("\n")
+            .filter(Boolean);
+
+          for (const file of files) {
+            JSON.parse(fs.readFileSync(file, "utf8"));
+          }
+
+          console.log(`Validated ${files.length} JSON files.`);
+          NODE
+
   frontend:
     runs-on: ubuntu-latest
     steps:
