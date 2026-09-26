@@ -8,6 +8,10 @@ CI validates:
 - TypeScript compiles in all three target builds;
 - Vite bundles all three targets;
 - .NET 10 restores/builds;
+- Dataverse plug-in package restores/builds and emits a NuGet package;
+- npm and NuGet restores use committed lockfiles;
+- a disposable checkout is fully rebranded and rebuilt as a template smoke test;
+- Bicep compiles;
 - CodeQL analyzes TypeScript/JavaScript and C#;
 - Dependabot tracks npm, NuGet and GitHub Actions.
 
