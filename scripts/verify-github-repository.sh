@@ -34,6 +34,11 @@ command -v gh >/dev/null 2>&1 || {
   exit 1
 }
 
+command -v jq >/dev/null 2>&1 || {
+  echo "jq is required." >&2
+  exit 1
+}
+
 gh auth status >/dev/null
 
 expect_repo_setting() {
