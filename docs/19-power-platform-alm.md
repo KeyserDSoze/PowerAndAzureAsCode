@@ -160,8 +160,8 @@ Once a real Custom API exists in the target environment:
 
 ```bash
 cd src/frontend
-pa app find-dataverse-api --search "YourOperation"
-pa app add dataverse-api --api-name <publisher-prefix>_YourOperation
+npx --no-install pa app find-dataverse-api --search "YourOperation"
+npx --no-install pa app add dataverse-api --api-name <publisher-prefix>_YourOperation
 ```
 
 Generated TypeScript is client transport code. Keep it behind application repositories/use-cases.
