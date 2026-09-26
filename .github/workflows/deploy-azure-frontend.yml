@@ -34,14 +34,14 @@ jobs:
       SWA_AUTH_MODE: ${{ vars.AZURE_SWA_AUTH_MODE || 'preconfigured' }}
       SWA_ENTRA_TENANT_ID: ${{ vars.AZURE_SWA_ENTRA_TENANT_ID }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
         with:
           node-version: 22
       - run: npm ci --no-audit --no-fund
       - run: npm run build:azure
       - name: Deploy prebuilt frontend
-        uses: Azure/static-web-apps-deploy@v1
+        uses: Azure/static-web-apps-deploy@1a947af9992250f3bc2e68ad0754c0b0c11566c9 # v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
