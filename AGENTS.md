@@ -79,7 +79,7 @@ Feature code MUST use `createPlatformClient()`, never read `VITE_HOST_TARGET` di
 
 ## Power Apps
 
-Initialize the derived application by running `pa app init` from `src/frontend`. Do not commit fabricated `power.config.json` identifiers in the template.
+Initialize the derived application by running `npx --no-install pa app init` from `src/frontend`. Do not commit fabricated `power.config.json` identifiers in the template.
 
 Generated Dataverse/connector services belong behind application repositories/services rather than being imported throughout the UI.
 
