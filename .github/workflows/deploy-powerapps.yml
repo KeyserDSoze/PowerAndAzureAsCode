@@ -35,7 +35,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - run: npm install --global @microsoft/power-apps-cli @microsoft/power-apps
       - run: npm run build:powerapps
       - name: Validate initialized Code App
