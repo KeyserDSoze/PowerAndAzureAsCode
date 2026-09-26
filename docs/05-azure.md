@@ -128,6 +128,14 @@ Use `scripts/bootstrap-runtime-dataverse-identity.sh` for the one-time runtime i
 
 These are **runtime** values. They are not frontend Vite values.
 
+## Network isolation constraint
+
+The linked App Service model is an application-layer integration, not a private-network topology. The backend must remain publicly reachable at the network layer for Static Web Apps to proxy requests. The link configures App Service Authentication with the `Azure Static Web Apps (Linked)` provider so only proxied traffic from the linked Static Web App is accepted by default.
+
+Do not add IP restrictions, Private Link or service-endpoint isolation to this specific topology and expect the SWA link to keep working.
+
+If a customer requires a private/network-isolated API, record a separate architecture decision and use an Azure topology that supports that requirement.
+
 ## Production recommendations
 
 - custom single-tenant Entra provider for the Static Web App;
@@ -136,7 +144,8 @@ These are **runtime** values. They are not frontend Vite values.
 - Application Insights;
 - least-privilege Dataverse application user;
 - custom domain and TLS policy;
-- network/private endpoint requirements assessed per customer;
+- linked App Service kept publicly reachable at the network layer as required by Static Web Apps bring-your-own API integration, while App Service Authentication restricts API access to the linked Static Web App;
+- if a customer requires a network-isolated/private backend, select a different Azure ingress/backend topology rather than weakening or forcing the linked-SWA model;
 - explicit backup/disaster recovery strategy for the systems that store business data.
 
 ## End-to-end bootstrap
