@@ -2,6 +2,13 @@ export interface BoilerplatePingResult {
   reply: string;
 }
 
+export function validateBoilerplatePingMessage(message: string): string {
+  if (typeof message !== "string" || message.length > 200) {
+    throw new Error("Ping message must be a string with at most 200 characters.");
+  }
+  return message;
+}
+
 type JsonRecord = Record<string, unknown>;
 
 function asRecord(value: unknown): JsonRecord {
