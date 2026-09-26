@@ -5,7 +5,7 @@ Use short-lived branches and pull requests for material changes.
 Before a pull request:
 
 ```bash
-npm install
+npm ci
 npm run validate
 npm run build:powerapps
 npm run build:powerpages
