@@ -73,8 +73,8 @@ After the Custom API exists:
 
 ```bash
 cd src/frontend
-pa app find-dataverse-api --search "BoilerplatePing"
-pa app add dataverse-api --api-name <publisher-prefix>_BoilerplatePing
+npx --no-install pa app find-dataverse-api --search "BoilerplatePing"
+npx --no-install pa app add dataverse-api --api-name <publisher-prefix>_BoilerplatePing
 ```
 
 Power Apps CLI then generates TypeScript models/services for the operation. Wrap those generated services behind application repositories/use-cases.
