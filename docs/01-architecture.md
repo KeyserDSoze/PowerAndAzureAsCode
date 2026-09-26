@@ -59,6 +59,8 @@ For Dataverse-centric applications, prefer one canonical backend surface such as
 
 The same operation can then be reached from all three hosts without duplicating behavior.
 
+The repository now proves this rule with the neutral `BoilerplatePing` slice. The shared UI calls one `PlatformClient` method; each host changes only transport, and all paths converge on the same Dataverse Custom API/plugin. Treat this as the reference shape when adding real business use-cases.
+
 ## Identity boundary
 
 End-user identity differs per host:
