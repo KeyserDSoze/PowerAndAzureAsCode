@@ -1,5 +1,5 @@
-import { readFile, readdir, rename, stat, writeFile } from "node:fs/promises";
-import { extname, join, relative, resolve } from "node:path";
+import { readFile, readdir, rename, writeFile } from "node:fs/promises";
+import { extname, join, resolve } from "node:path";
 
 const args = process.argv.slice(2);
 const valueAfter = (flag) => {
@@ -117,6 +117,20 @@ const frontendPackagePath = resolve("src/frontend/package.json");
 const frontendPackage = JSON.parse(await readFile(frontendPackagePath, "utf8"));
 frontendPackage.name = `${scope}/web`;
 await writeFile(frontendPackagePath, JSON.stringify(frontendPackage, null, 2) + "\n");
+
+const packageLockPath = resolve("package-lock.json");
+const packageLock = JSON.parse(await readFile(packageLockPath, "utf8"));
+packageLock.name = rootPackage.name;
+
+if (packageLock.packages?.[""]) {
+  packageLock.packages[""].name = rootPackage.name;
+}
+
+if (packageLock.packages?.["src/frontend"]) {
+  packageLock.packages["src/frontend"].name = frontendPackage.name;
+}
+
+await writeFile(packageLockPath, JSON.stringify(packageLock, null, 2) + "\n");
 
 async function renameMatchingPaths(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
