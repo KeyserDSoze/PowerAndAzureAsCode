@@ -140,4 +140,4 @@ app.MapPost("/api/boilerplate-ping", async (
 
 app.Run();
 
-internal sealed record BoilerplatePingRequest(string? Message);
+public sealed record BoilerplatePingRequest(string? Message);
