@@ -51,7 +51,7 @@ UI, routing, state, validation, domain models and application use-cases belong i
 Read [docs/00-getting-started.md](docs/00-getting-started.md), then choose the host using [docs/02-target-selection.md](docs/02-target-selection.md).
 
 ```bash
-npm install
+npm ci
 npm run validate
 npm run dev
 ```
