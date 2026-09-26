@@ -68,6 +68,21 @@ npx --no-install pa app add dataverse-api --api-name <publisher-prefix>_YourOper
 
 Power Apps CLI generates the service used by the frontend. Keep that service behind application repositories/use-cases and never duplicate cross-host invariants in React.
 
+### Wire the included BoilerplatePing example
+
+After the Dataverse solution contains the unbound `<publisher-prefix>_BoilerplatePing` Custom API, run:
+
+```bash
+cd src/frontend
+npx --no-install pa app add dataverse-api --api-name <publisher-prefix>_BoilerplatePing
+cd ../..
+npm run configure:powerapps-ping -- --api-name <publisher-prefix>_BoilerplatePing
+```
+
+The second command rewrites only `src/frontend/src/platform/powerapps/boilerplatePingBridge.ts` so the Power Apps adapter calls the generated service. Shared feature code continues to depend only on `PlatformClient`.
+
+The generated Dataverse service is environment metadata/transport and should be regenerated when the Custom API contract changes.
+
 ## Authentication
 
 Authentication is owned by the Power Apps host. Do not add a second MSAL login flow merely to identify the same Power Apps user.
