@@ -36,6 +36,8 @@ jobs:
           while IFS= read -r -d '' file; do
             node --check "$file"
           done < <(find scripts -type f -name '*.mjs' -print0)
+      - name: Run tooling regression tests
+        run: npm run test:tooling
       - name: Validate tracked JSON
         shell: bash
         run: |
