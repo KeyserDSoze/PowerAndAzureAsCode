@@ -48,19 +48,6 @@ const displayFiles = [
   "src/frontend/powerpages.config.json"
 ];
 
-const readmePath = resolve("README.md");
-let readme = await readFile(readmePath, "utf8");
-readme = readme.replace(
-  new RegExp("^# " + oldDisplayName.replace(/[.*+?^$()|[\\]\\]/g, "\\const displayFiles = [
-  "README.md",
-  "src/frontend/index.html",
-  "src/frontend/src/App.tsx",
-  "src/frontend/powerpages.config.json"
-];") + "$", "m"),
-  "# " + displayName
-);
-await writeFile(readmePath, readme);
-
 for (const file of displayFiles) {
   const path = resolve(file);
   let content = await readFile(path, "utf8");
@@ -69,6 +56,14 @@ for (const file of displayFiles) {
     .replaceAll(oldScope, scope);
   await writeFile(path, content);
 }
+
+const readmePath = resolve("README.md");
+let readme = await readFile(readmePath, "utf8");
+readme = readme.replace(
+  `# ${oldDisplayName}\n`,
+  `# ${displayName}\n`
+);
+await writeFile(readmePath, readme);
 
 const ignoredDirectories = new Set([
   ".git",
@@ -157,7 +152,10 @@ async function renameMatchingPaths(directory) {
     }
 
     if (entry.name.includes(oldCodeName)) {
-      const renamed = join(directory, entry.name.replaceAll(oldCodeName, newCodeName));
+      const renamed = join(
+        directory,
+        entry.name.replaceAll(oldCodeName, newCodeName)
+      );
       await rename(current, renamed);
     }
   }
