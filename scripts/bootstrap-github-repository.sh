@@ -10,6 +10,9 @@ Usage:
     [--approvals 1]
 
 Configures repository governance with GitHub CLI:
+  - marks the repository as a template repository;
+  - enables automatic branch deletion after merge;
+  - enables auto-merge and update-branch support;
   - protects the target branch;
   - requires the boilerplate CI checks;
   - requires pull requests;
@@ -63,6 +66,21 @@ command -v gh >/dev/null 2>&1 || {
 }
 
 gh auth status >/dev/null
+
+echo "Configuring repository template/merge settings..."
+
+gh api \
+  --method PATCH \
+  -H "Accept: application/vnd.github+json" \
+  "repos/$REPOSITORY" \
+  --input - <<'JSON'
+{
+  "is_template": true,
+  "delete_branch_on_merge": true,
+  "allow_auto_merge": true,
+  "allow_update_branch": true
+}
+JSON
 
 echo "Protecting $REPOSITORY branch '$BRANCH'..."
 
@@ -132,6 +150,10 @@ cat <<EOF
 
 GitHub repository baseline configured.
 
+Template repository: enabled
+Delete branch on merge: enabled
+Auto-merge: enabled
+Update branch: enabled
 Repository: $REPOSITORY
 Protected branch: $BRANCH
 Required approvals: $APPROVALS
