@@ -54,3 +54,40 @@ jobs:
         with:
           inlineScript: |
             az bicep build --file infra/azure/main.bicep --stdout > /dev/null
+
+
+  rebrand-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 10.0.x
+      - run: npm ci --no-audit --no-fund
+      - name: Rebrand a disposable checkout
+        run: npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
+      - name: Verify npm lock consistency after rebrand
+        run: npm ci --no-audit --no-fund
+      - run: npm run validate
+      - run: npm run build:powerapps
+      - run: npm run build:powerpages
+      - run: npm run build:azure
+      - name: Verify rebranded .NET projects
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t azure_projects < <(find src/backends/azure-api -type f -name '*.csproj')
+          mapfile -t plugin_projects < <(find src/backends/dataverse -type f -name '*.csproj')
+
+          test "${#azure_projects[@]}" -eq 1
+          test "${#plugin_projects[@]}" -eq 1
+
+          dotnet restore "${azure_projects[0]}" --locked-mode
+          dotnet build "${azure_projects[0]}" -c Release --no-restore
+          dotnet restore "${plugin_projects[0]}" --locked-mode
+          dotnet build "${plugin_projects[0]}" -c Release --no-restore
+
+          test -z "$(grep -R --exclude-dir=.git --exclude=package-lock.json -l 'PowerAndAzureAsCode' src || true)"
