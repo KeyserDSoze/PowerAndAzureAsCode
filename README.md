@@ -11,19 +11,25 @@ The repository is intentionally a **boilerplate**. It contains no customer data,
 ## Core idea
 
 ```text
-                         Shared React application
-                                  |
-                    PlatformClient / host adapters
-                 +----------------+----------------+
-                 |                |                |
-            Power Apps       Power Pages          Azure
-             Code App          Code Site       Static Web App
-                 |                |                |
-       generated connectors   Server Logic      /api -> .NET 10
-                 |                |                |
-                 +----------------+----------------+
-                                  |
-                               Dataverse
+                           Shared React application
+                                    |
+                         PlatformClient / adapters
+                     +--------------+--------------+
+                     |              |              |
+                Power Apps     Power Pages        Azure
+                 Code App        Code Site     Static Web App
+                     |              |              |
+              generated client  Server Logic   /api -> .NET 10
+                     |              |              |
+                     +--------------+--------------+
+                                    |
+                          Dataverse application surface
+                         /                          \
+                simple table CRUD          business operations
+                                                |
+                                       Dataverse Custom APIs
+                                                |
+                                        Dataverse plug-ins
 ```
 
 UI, routing, state, validation, domain models and application use-cases belong in shared code. Host-specific authentication, transport and deployment details stay behind adapters.
