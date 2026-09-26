@@ -36,6 +36,8 @@ jobs:
           while IFS= read -r -d '' file; do
             node --check "$file"
           done < <(find scripts -type f -name '*.mjs' -print0)
+      - name: Run tooling regression tests
+        run: npm run test:tooling
       - name: Validate tracked JSON
         shell: bash
         run: |
@@ -64,6 +66,7 @@ jobs:
           node-version-file: .node-version
       - run: npm ci --no-audit --no-fund
       - run: npm run validate
+      - run: npm run test:platform
       - run: npm run build:powerapps
       - run: npm run build:powerpages
       - run: npm run build:azure
@@ -77,6 +80,8 @@ jobs:
           global-json-file: global.json
       - run: dotnet restore src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --locked-mode
       - run: dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.Api.csproj --configuration Release --no-restore
+      - name: Run Static Web Apps principal smoke tests
+        run: dotnet run --project tests/azure-api-auth-smoke/AzureApiAuthSmoke.csproj --configuration Release
 
   dataverse-plugin:
     runs-on: ubuntu-latest
@@ -118,6 +123,7 @@ jobs:
       - name: Verify npm lock consistency after rebrand
         run: npm ci --no-audit --no-fund
       - run: npm run validate
+      - run: npm run test:platform
       - run: npm run build:powerapps
       - run: npm run build:powerpages
       - run: npm run build:azure
@@ -135,6 +141,7 @@ jobs:
 
           dotnet restore "${azure_projects[0]}" --locked-mode
           dotnet build "${azure_projects[0]}" -c Release --no-restore
+          dotnet run --project tests/azure-api-auth-smoke/AzureApiAuthSmoke.csproj -c Release
           dotnet restore "${plugin_projects[0]}" --locked-mode
           dotnet build "${plugin_projects[0]}" -c Release --no-restore
 
@@ -143,4 +150,4 @@ jobs:
             --exclude-dir=obj \
             --exclude-dir=dist \
             --exclude=packages.lock.json \
-            -l 'PowerAndAzureAsCode' src || true)"
+            -l 'PowerAndAzureAsCode' src tests || true)"

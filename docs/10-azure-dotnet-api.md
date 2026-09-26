@@ -54,6 +54,15 @@ GET /api/dataverse/health
 
 Creates a real Dataverse `ServiceClient` and executes `WhoAmI`. It returns only connectivity status, never the Dataverse user identifier or raw fault.
 
+```http
+POST /api/boilerplate-ping
+Content-Type: application/json
+
+{ "message": "hello" }
+```
+
+Demonstrates the intended BFF pattern: the API validates the request, invokes the configured Dataverse Custom API with `OrganizationRequest`, and normalizes the response to `{ "reply": "..." }`. The authoritative operation remains the Dataverse Custom API/plugin.
+
 ## Dataverse
 
 The starter uses:
@@ -62,7 +71,7 @@ The starter uses:
 Microsoft.PowerPlatform.Dataverse.Client
 ```
 
-The connection factory reads ASP.NET Core configuration.
+The connection factory reads ASP.NET Core configuration. The neutral example additionally reads `Dataverse:BoilerplatePingApiName`; do not hard-code a publisher prefix in the generic template.
 
 Production uses App Service settings plus a Key Vault reference by default. The Bicep baseline enables a system-assigned App Service Managed Identity and grants it Key Vault read access.
 

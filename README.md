@@ -44,12 +44,14 @@ UI, routing, state, validation, domain models and application use-cases belong i
 - ASP.NET Core .NET 10 API starter for a linked Azure App Service backend.
 - Dataverse connection boundary for Azure, including a real `WhoAmI` connectivity endpoint.
 - Dataverse plug-in backend scaffold for shared Custom API business operations.
+- Neutral `BoilerplatePing` vertical slice demonstrating one canonical Custom API through Power Apps, Power Pages and Azure transports.
 - Azure Key Vault, App Service Managed Identity, Log Analytics and Application Insights Bicep baseline.
 - Admin bootstrap scripts for Entra runtime/deployment identities and Static Web Apps single-tenant auth.
 - GitHub Actions for CI and independent deployment to each host.
 - OIDC/Federated Identity guidance where supported.
 - Complete secrets/variables inventory.
 - Rebranding, versioning and validation scripts.
+- Template-owned behavioral tests for repository validation, host response contracts and Static Web Apps principal parsing.
 - Architecture decisions and operational runbooks.
 
 ## Start here

@@ -1,3 +1,5 @@
+import type { BoilerplatePingResult } from "./operations";
+
 export type HostTarget = "powerapps" | "powerpages" | "azure";
 
 export interface UserIdentity {
@@ -16,4 +18,5 @@ export interface PlatformClient {
   readonly host: HostTarget;
   getCurrentUser(): Promise<UserIdentity | null>;
   health(): Promise<HealthResult>;
+  boilerplatePing(message: string): Promise<BoilerplatePingResult>;
 }

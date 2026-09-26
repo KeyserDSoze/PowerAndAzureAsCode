@@ -13,8 +13,25 @@ param apiWebAppName string
 @description('App Service plan name.')
 param appServicePlanName string = '${apiWebAppName}-plan'
 
+@description('App Service plan SKU name. Keep the B1 default for low-cost development; override per environment for production sizing.')
+param appServiceSkuName string = 'B1'
+
+@description('App Service plan SKU tier matching appServiceSkuName.')
+param appServiceSkuTier string = 'Basic'
+
+@description('App Service plan instance capacity.')
+@minValue(1)
+param appServicePlanCapacity int = 1
+
 @description('Globally unique Key Vault name.')
 param keyVaultName string
+
+@description('Whether Key Vault permits public network access. Disable only when the chosen topology provides a working private access path for deployment/runtime.')
+@allowed([
+  'Enabled'
+  'Disabled'
+])
+param keyVaultPublicNetworkAccess string = 'Enabled'
 
 @description('Log Analytics workspace name.')
 param logAnalyticsWorkspaceName string
@@ -36,6 +53,7 @@ module keyVault './key-vault.bicep' = {
   params: {
     location: location
     keyVaultName: keyVaultName
+    publicNetworkAccess: keyVaultPublicNetworkAccess
   }
 }
 
@@ -45,6 +63,9 @@ module appService './app-service.bicep' = {
     location: location
     apiWebAppName: apiWebAppName
     appServicePlanName: appServicePlanName
+    appServiceSkuName: appServiceSkuName
+    appServiceSkuTier: appServiceSkuTier
+    appServicePlanCapacity: appServicePlanCapacity
   }
 }
 

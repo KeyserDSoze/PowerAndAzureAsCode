@@ -201,6 +201,14 @@ Log Analytics workspace used by Application Insights.
 
 Workspace-based Application Insights component name.
 
+#### `AZURE_APP_SERVICE_SKU_NAME`, `AZURE_APP_SERVICE_SKU_TIER`, `AZURE_APP_SERVICE_PLAN_CAPACITY`
+
+Optional environment-specific App Service sizing overrides. The template defaults to `B1` / `Basic` / `1` for a low-cost development baseline. Production environments should set values deliberately.
+
+#### `AZURE_KEY_VAULT_PUBLIC_NETWORK_ACCESS`
+
+Optional. `Enabled` or `Disabled`; defaults to `Enabled`. Disable only when the selected deployment/runtime topology provides the required private access path.
+
 #### `AZURE_SWA_AUTH_MODE`
 
 Use `preconfigured` or `singletenant` for the Azure Static Web Apps authentication provider.
@@ -242,6 +250,7 @@ GitHub Environment variables used by the runtime configuration workflow:
 - `DATAVERSE_URL`
 - `DATAVERSE_RUNTIME_CLIENT_ID`
 - `DATAVERSE_SECRET_NAME` (optional; defaults to `dataverse-client-secret`)
+- `DATAVERSE_BOILERPLATE_PING_API_NAME` (publisher-prefixed Custom API name for the neutral cross-host example)
 
 These values belong to **Azure App Service application settings** or Key Vault references, not to the React build.
 
@@ -281,6 +290,10 @@ Dataverse:ClientSecret
 ```
 
 ASP.NET Core maps double underscores to nested configuration keys.
+
+### `Dataverse__BoilerplatePingApiName`
+
+Non-secret name of the Dataverse Custom API used by the included neutral vertical slice, for example `abc_BoilerplatePing`. The generic repository cannot know the publisher prefix, so this remains environment configuration.
 
 ---
 

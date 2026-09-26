@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddSingleton<DataverseConnectionFactory>();
+builder.Services.AddSingleton<DataverseBoilerplatePing>();
 
 var app = builder.Build();
 
@@ -92,4 +93,51 @@ app.MapGet("/api/dataverse/health", (
     }
 });
 
+app.MapPost("/api/boilerplate-ping", async (
+    HttpContext context,
+    BoilerplatePingRequest request,
+    DataverseBoilerplatePing operation,
+    ILogger<Program> logger,
+    CancellationToken cancellationToken) =>
+{
+    if (context.User.Identity?.IsAuthenticated != true)
+    {
+        return Results.Unauthorized();
+    }
+
+    if (request.Message is null || request.Message.Length > 200)
+    {
+        return Results.BadRequest(new
+        {
+            code = "INVALID_REQUEST",
+            message = "message must be a string with at most 200 characters."
+        });
+    }
+
+    if (!operation.IsConfigured)
+    {
+        return Results.Problem(
+            statusCode: StatusCodes.Status503ServiceUnavailable,
+            title: "Dataverse BoilerplatePing is not configured.");
+    }
+
+    try
+    {
+        var reply = await operation.ExecuteAsync(request.Message, cancellationToken);
+        return Results.Ok(new { reply });
+    }
+    catch (Exception exception)
+    {
+        logger.LogError(
+            "BoilerplatePing failed with exception type {ExceptionType}.",
+            exception.GetType().FullName);
+
+        return Results.Problem(
+            statusCode: StatusCodes.Status502BadGateway,
+            title: "Dataverse operation failed.");
+    }
+});
+
 app.Run();
+
+public sealed record BoilerplatePingRequest(string? Message);

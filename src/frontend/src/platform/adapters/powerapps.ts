@@ -1,4 +1,5 @@
 import { getContext } from "@microsoft/power-apps/app";
+import { invokeBoilerplatePing } from "../powerapps/boilerplatePingBridge";
 import type { PlatformClient } from "../types";
 
 export function createHostPlatformClient(): PlatformClient {
@@ -29,6 +30,7 @@ export function createHostPlatformClient(): PlatformClient {
           detail: error instanceof Error ? error.message : "Power Apps host context is unavailable."
         };
       }
-    }
+    },
+    boilerplatePing: invokeBoilerplatePing
   };
 }

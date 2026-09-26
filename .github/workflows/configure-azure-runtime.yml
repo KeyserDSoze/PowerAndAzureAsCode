@@ -38,6 +38,15 @@ jobs:
           set -euo pipefail
           test -n "${{ vars.DATAVERSE_URL }}"
           test -n "${{ vars.DATAVERSE_RUNTIME_CLIENT_ID }}"
+          test -n "${{ vars.DATAVERSE_BOILERPLATE_PING_API_NAME }}"
           test -n "${{ vars.AZURE_KEY_VAULT_NAME }}"
 
-          az webapp config appsettings set             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --name "${{ vars.AZURE_API_WEBAPP_NAME }}"             --settings               "Dataverse__Url=${{ vars.DATAVERSE_URL }}"               "Dataverse__ClientId=${{ vars.DATAVERSE_RUNTIME_CLIENT_ID }}"               "Dataverse__ClientSecret=@Microsoft.KeyVault(VaultName=${{ vars.AZURE_KEY_VAULT_NAME }};SecretName=$DATAVERSE_SECRET_NAME)"             --output none
+          az webapp config appsettings set \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ vars.AZURE_API_WEBAPP_NAME }}" \
+            --settings \
+              "Dataverse__Url=${{ vars.DATAVERSE_URL }}" \
+              "Dataverse__ClientId=${{ vars.DATAVERSE_RUNTIME_CLIENT_ID }}" \
+              "Dataverse__ClientSecret=@Microsoft.KeyVault(VaultName=${{ vars.AZURE_KEY_VAULT_NAME }};SecretName=$DATAVERSE_SECRET_NAME)" \
+              "Dataverse__BoilerplatePingApiName=${{ vars.DATAVERSE_BOILERPLATE_PING_API_NAME }}" \
+            --output none

@@ -23,6 +23,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: ${{ inputs.environment }}
+    env:
+      APP_SERVICE_SKU_NAME: ${{ vars.AZURE_APP_SERVICE_SKU_NAME || 'B1' }}
+      APP_SERVICE_SKU_TIER: ${{ vars.AZURE_APP_SERVICE_SKU_TIER || 'Basic' }}
+      APP_SERVICE_PLAN_CAPACITY: ${{ vars.AZURE_APP_SERVICE_PLAN_CAPACITY || '1' }}
+      KEY_VAULT_PUBLIC_NETWORK_ACCESS: ${{ vars.AZURE_KEY_VAULT_PUBLIC_NETWORK_ACCESS || 'Enabled' }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Azure login with OIDC
@@ -31,20 +36,79 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
       - name: Ensure resource group
-        run: az group create --name "${{ vars.AZURE_RESOURCE_GROUP }}" --location "${{ vars.AZURE_LOCATION }}"
+        run: |
+          az group create \
+            --name "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --location "${{ vars.AZURE_LOCATION }}" \
+            --output none
+
       - name: Deploy Bicep
         run: |
-          az deployment group create             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --template-file infra/azure/main.bicep             --parameters               staticWebAppName="${{ vars.AZURE_STATIC_WEB_APP_NAME }}"               apiWebAppName="${{ vars.AZURE_API_WEBAPP_NAME }}"               keyVaultName="${{ vars.AZURE_KEY_VAULT_NAME }}"               logAnalyticsWorkspaceName="${{ vars.AZURE_LOG_ANALYTICS_WORKSPACE_NAME }}"               appInsightsName="${{ vars.AZURE_APP_INSIGHTS_NAME }}"               location="${{ vars.AZURE_LOCATION }}"               staticWebAppLocation="${{ vars.AZURE_STATIC_WEB_APP_LOCATION || vars.AZURE_LOCATION }}"
+          az deployment group create \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --template-file infra/azure/main.bicep \
+            --parameters \
+              staticWebAppName="${{ vars.AZURE_STATIC_WEB_APP_NAME }}" \
+              apiWebAppName="${{ vars.AZURE_API_WEBAPP_NAME }}" \
+              keyVaultName="${{ vars.AZURE_KEY_VAULT_NAME }}" \
+              logAnalyticsWorkspaceName="${{ vars.AZURE_LOG_ANALYTICS_WORKSPACE_NAME }}" \
+              appInsightsName="${{ vars.AZURE_APP_INSIGHTS_NAME }}" \
+              location="${{ vars.AZURE_LOCATION }}" \
+              staticWebAppLocation="${{ vars.AZURE_STATIC_WEB_APP_LOCATION || vars.AZURE_LOCATION }}" \
+              appServiceSkuName="$APP_SERVICE_SKU_NAME" \
+              appServiceSkuTier="$APP_SERVICE_SKU_TIER" \
+              appServicePlanCapacity="$APP_SERVICE_PLAN_CAPACITY" \
+              keyVaultPublicNetworkAccess="$KEY_VAULT_PUBLIC_NETWORK_ACCESS" \
+            --output none
+
       - name: Link App Service backend to Static Web App
+        id: backend
         shell: bash
         run: |
-          API_ID=$(az webapp show             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --name "${{ vars.AZURE_API_WEBAPP_NAME }}"             --query id -o tsv)
+          set -euo pipefail
+          api_id="$(az webapp show \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ vars.AZURE_API_WEBAPP_NAME }}" \
+            --query id -o tsv)"
 
-          az staticwebapp backends link             --name "${{ vars.AZURE_STATIC_WEB_APP_NAME }}"             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --backend-resource-id "$API_ID"             --backend-region "${{ vars.AZURE_LOCATION }}"
+          az staticwebapp backends link \
+            --name "${{ vars.AZURE_STATIC_WEB_APP_NAME }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --backend-resource-id "$api_id" \
+            --backend-region "${{ vars.AZURE_LOCATION }}" \
+            --output none
+
+          echo "api_id=$api_id" >> "$GITHUB_OUTPUT"
+
+      - name: Verify linked backend
+        shell: bash
+        run: |
+          set -euo pipefail
+          az staticwebapp backends validate \
+            --name "${{ vars.AZURE_STATIC_WEB_APP_NAME }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --backend-resource-id "${{ steps.backend.outputs.api_id }}" \
+            --backend-region "${{ vars.AZURE_LOCATION }}" \
+            --output none
+
+          az staticwebapp backends show \
+            --name "${{ vars.AZURE_STATIC_WEB_APP_NAME }}" \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --output table
+
       - name: Configure Application Insights connection
         shell: bash
         run: |
-          CONNECTION_STRING=$(az monitor app-insights component show             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --app "${{ vars.AZURE_APP_INSIGHTS_NAME }}"             --query connectionString -o tsv)
+          set -euo pipefail
+          connection_string="$(az monitor app-insights component show \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --app "${{ vars.AZURE_APP_INSIGHTS_NAME }}" \
+            --query connectionString -o tsv)"
 
-          az webapp config appsettings set             --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}"             --name "${{ vars.AZURE_API_WEBAPP_NAME }}"             --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$CONNECTION_STRING"             --output none
+          az webapp config appsettings set \
+            --resource-group "${{ vars.AZURE_RESOURCE_GROUP }}" \
+            --name "${{ vars.AZURE_API_WEBAPP_NAME }}" \
+            --settings "APPLICATIONINSIGHTS_CONNECTION_STRING=$connection_string" \
+            --output none

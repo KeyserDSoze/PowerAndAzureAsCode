@@ -92,9 +92,20 @@ See:
 src/backends/dataverse/README.md
 src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/
 src/backends/powerpages/server-logic/boilerplate-ping/server.js
+src/backends/azure-api/PowerAndAzureAsCode.Api/Dataverse/DataverseBoilerplatePing.cs
+src/frontend/src/platform/powerapps/boilerplatePingBridge.ts
 ```
 
-The sample is generic and contains no customer-specific tables or business rules.
+The sample is generic and contains no customer-specific tables or business rules. Its purpose is to prove the transport boundary end to end.
+
+For a derived Power Apps target, generate the real Custom API service from the environment and wire the bridge:
+
+```bash
+cd src/frontend
+npx --no-install pa app add dataverse-api --api-name <publisher-prefix>_BoilerplatePing
+cd ../..
+npm run configure:powerapps-ping -- --api-name <publisher-prefix>_BoilerplatePing
+```
 
 
 ## ALM

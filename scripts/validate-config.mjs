@@ -1,5 +1,6 @@
 import { access, readFile, readdir } from "node:fs/promises";
 import { resolve } from "node:path";
+import { assertNoForbiddenChatCitationTokens } from "./forbidden-chat-citations.mjs";
 
 const requiredFiles = [
   "brand.config.json",
@@ -23,6 +24,7 @@ const requiredFiles = [
   "scripts/bootstrap-powerplatform-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-solution.sh",
   "scripts/bootstrap-github-repository.sh",
+  "scripts/verify-github-repository.sh",
   "scripts/install-powerpages-server-logic-example.mjs",
   "docs/20-github-repository-hardening.md",
   ".github/workflows/deploy-powerplatform-solution.yml",
@@ -127,28 +129,6 @@ for (const entry of await readdir(workflowDir, { withFileTypes: true })) {
   }
 }
 
-async function walkTextFiles(directory) {
-  const result = [];
-  for (const entry of await readdir(directory, { withFileTypes: true })) {
-    if ([".git", "node_modules", "bin", "obj", "dist", "artifacts"].includes(entry.name)) {
-      continue;
-    }
-
-    const full = resolve(directory, entry.name);
-    if (entry.isDirectory()) {
-      result.push(...(await walkTextFiles(full)));
-    } else if (/\.(md|txt|json|ya?ml|mjs|js|ts|tsx|cs|csproj|bicep|sh|html)$/i.test(entry.name)) {
-      result.push(full);
-    }
-  }
-  return result;
-}
-
-for (const file of await walkTextFiles(resolve("."))) {
-  const text = await readFile(file, "utf8");
-  if (text.includes("cite") || text.includes("memcite")) {
-    throw new Error(`Chat citation token found in repository file: ${file}`);
-  }
-}
+await assertNoForbiddenChatCitationTokens(resolve("."));
 
 console.log("Configuration and template invariants validation passed.");

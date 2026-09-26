@@ -18,7 +18,7 @@ SubmitRequest
 ApproveRequest
 ```
 
-The generic boilerplate intentionally does not include any business-specific Custom API.
+The generic boilerplate includes only a neutral `BoilerplatePing` Custom API plug-in/transport example. It contains no customer table or product-specific business rule.
 
 ## Why not write directly from every UI
 
@@ -139,6 +139,23 @@ instead of exposing a generic entity-patch proxy.
 ## Shared Dataverse backend
 
 The generic plug-in scaffold is under `src/backends/dataverse`. Use this layer for business operations that must behave identically from Power Apps, Power Pages and Azure.
+
+The included neutral vertical slice is:
+
+```text
+Shared React PlatformClient.boilerplatePing
+  ├─ Power Apps -> generated <prefix>_BoilerplatePing service
+  ├─ Power Pages -> Server Logic -> InvokeCustomApi
+  └─ Azure -> POST /api/boilerplate-ping -> OrganizationRequest
+                                   |
+                                   v
+                    <prefix>_BoilerplatePing
+                                   |
+                                   v
+                       BoilerplatePingPlugin
+```
+
+For Azure set `Dataverse__BoilerplatePingApiName` (GitHub variable `DATAVERSE_BOILERPLATE_PING_API_NAME`) to the real publisher-prefixed Custom API name. Power Pages injects the publisher prefix when installing its example Server Logic record. Power Apps generates its typed service from the environment and wires it through the repository bridge helper.
 
 ## Solution ALM
 
