@@ -1,13 +1,19 @@
 param location string
 param apiWebAppName string
 param appServicePlanName string
+param appServiceSkuName string = 'B1'
+param appServiceSkuTier string = 'Basic'
+
+@minValue(1)
+param appServicePlanCapacity int = 1
 
 resource plan 'Microsoft.Web/serverfarms@2024-04-01' = {
   name: appServicePlanName
   location: location
   sku: {
-    name: 'B1'
-    tier: 'Basic'
+    name: appServiceSkuName
+    tier: appServiceSkuTier
+    capacity: appServicePlanCapacity
   }
   kind: 'linux'
   properties: {
