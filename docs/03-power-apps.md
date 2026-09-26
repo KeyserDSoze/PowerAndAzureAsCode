@@ -13,7 +13,7 @@ The shared web workspace includes the official Power Apps client library `@micro
 From `src/frontend`:
 
 ```bash
-pa app init --display-name "Contoso Workspace" --environment-id <environment-id>
+npx --no-install pa app init --display-name "Contoso Workspace" --environment-id <environment-id>
 ```
 
 This creates `power.config.json`.
@@ -25,7 +25,7 @@ Do not copy a fake `power.config.json` from another tenant.
 ## Local host
 
 ```bash
-pa app run
+npx --no-install pa app run
 ```
 
 Open the Local Play URL using the same browser profile used for the Power Platform tenant.
@@ -62,8 +62,8 @@ After creating a Custom API in the target solution:
 
 ```bash
 cd src/frontend
-pa app find-dataverse-api --search "YourOperation"
-pa app add dataverse-api --api-name <publisher-prefix>_YourOperation
+npx --no-install pa app find-dataverse-api --search "YourOperation"
+npx --no-install pa app add dataverse-api --api-name <publisher-prefix>_YourOperation
 ```
 
 Power Apps CLI generates the service used by the frontend. Keep that service behind application repositories/use-cases and never duplicate cross-host invariants in React.
@@ -74,7 +74,7 @@ Authentication is owned by the Power Apps host. Do not add a second MSAL login f
 
 ## Unattended publishing
 
-Current Code Apps publishing supports service-principal authentication for `pa app push --non-interactive`.
+Current Code Apps publishing supports service-principal authentication for `npx --no-install pa app push --non-interactive`.
 
 Required values (target IDs/secrets are GitHub Environment-scoped; the auto-deploy guard is a repository variable):
 
@@ -95,13 +95,13 @@ Typical one-time maker operation:
 
 ```bash
 pa auth login --account <maker>
-pa app share --principal <enterprise-application-object-id> --access edit
+npx --no-install pa app share --principal <enterprise-application-object-id> --access edit
 ```
 
 The CI job then publishes:
 
 ```bash
-pa app push --non-interactive
+npx --no-install pa app push --non-interactive
 ```
 
 ## Solution-aware publishing
@@ -109,7 +109,7 @@ pa app push --non-interactive
 If `POWERAPPS_SOLUTION_ID` is set, the workflow uses:
 
 ```bash
-pa app push --non-interactive --solution-id <solution-id>
+npx --no-install pa app push --non-interactive --solution-id <solution-id>
 ```
 
 ## First deployment sequence
