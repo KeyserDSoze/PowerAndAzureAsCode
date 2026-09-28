@@ -8,17 +8,17 @@ CI validates:
 - TypeScript compiles in all three target builds;
 - Vite bundles all three targets;
 - .NET 10 restores/builds;
-- Dataverse plug-in package restores/builds and emits a NuGet package;
+- Dataverse plug-in package restores/builds from a clean Release output, uses a non-incremental build and verifies the fresh NuGet package contains a DLL;
 - npm and NuGet restores use committed lockfiles;
-- a disposable checkout is fully rebranded and rebuilt as a template smoke test;
+- a disposable checkout is fully rebranded and rebuilt as a template smoke test, including a generated-style `.cdsproj` reference fixture;
 - Bicep compiles;
-- CodeQL analyzes TypeScript/JavaScript and C#;
+- CodeQL analyzes TypeScript/JavaScript and C# in public repositories, and in private repositories when code scanning is enabled and `CODEQL_ENABLED=true`;
 - Dependabot tracks npm, NuGet and GitHub Actions;
 - repository-tooling regression tests verify forbidden citation scanning;
 - Node's TypeScript-capable test runner verifies shared host response contracts;
 - a dependency-free .NET smoke executable verifies Static Web Apps principal parsing, including rejection of malformed headers and filtering the anonymous role.
 
-These template-owned tests intentionally avoid a deployed tenant. Environment integration tests remain the responsibility of derived products.
+These template-owned tests intentionally avoid a deployed tenant. They now encode several field-test regressions (Power Apps local dev invariants, `net462` plug-in target, generated bridge contract, solution package pinning and derived `.cdsproj` rebranding), but environment integration tests remain the responsibility of derived products.
 
 ## Derived application tests
 
