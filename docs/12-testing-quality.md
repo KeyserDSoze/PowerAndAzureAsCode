@@ -18,7 +18,7 @@ CI validates:
 - Node's TypeScript-capable test runner verifies shared host response contracts;
 - a dependency-free .NET smoke executable verifies Static Web Apps principal parsing, including rejection of malformed headers and filtering the anonymous role.
 
-These template-owned tests intentionally avoid a deployed tenant. They now encode several field-test regressions (Power Apps local dev invariants, `net462` plug-in target, generated bridge contract, solution package pinning and derived `.cdsproj` rebranding), but environment integration tests remain the responsibility of derived products.
+These template-owned tests intentionally avoid a deployed tenant. A real derived-project field test found failures that compilation-only CI cannot see, including Power Apps local-host startup, first-time plug-in registration order, default-environment unattended deployment, generated Power Apps service shape and private-repository CodeQL behavior. The template now encodes those findings as static/runtime guards where possible, but environment integration tests remain the responsibility of derived products.
 
 ## Derived application tests
 
@@ -28,7 +28,7 @@ Add:
 - component tests for shared React features;
 - adapter tests per host;
 - API integration tests;
-- Dataverse integration tests in non-production;
+- Dataverse integration tests in non-production, including first registration and subsequent `pac plugin push` update paths;
 - Playwright end-to-end tests for supported delivery channels.
 
 ## Important test principle
@@ -37,7 +37,7 @@ Do not only test the Azure build and assume Power Pages/Power Apps work because 
 
 Host integration failures are different:
 
-- Power Apps connector generation/permissions;
+- Power Apps local-host port/mode, generated service contract, separate `pa` authentication context, solution targeting and environment permissions;
 - Power Pages CSRF/web roles/site permissions;
 - Static Web Apps principal/linked-backend behavior.
 
