@@ -66,6 +66,9 @@ jobs:
           node-version-file: .node-version
       - run: npm ci --no-audit --no-fund
       - run: npm run validate
+      - name: Verify Power Apps CLI default-mode Vite config load
+        working-directory: src/frontend
+        run: npx --no-install vite build --mode development
       - run: npm run test:platform
       - run: npm run build:powerapps
       - run: npm run build:powerpages
