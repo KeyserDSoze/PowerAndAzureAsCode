@@ -10,7 +10,7 @@ const ignoredDirectories = new Set([
   "artifacts"
 ]);
 
-const textFilePattern = /\.(md|txt|json|ya?ml|mjs|js|ts|tsx|cs|csproj|bicep|sh|html)$/i;
+const textFilePattern = /\.(md|txt|json|ya?ml|mjs|js|ts|tsx|cs|csproj|cdsproj|bicep|sh|html)$/i;
 
 export const forbiddenChatCitationTokens = [
   String.fromCodePoint(0xe200) + "cite" + String.fromCodePoint(0xe202),
