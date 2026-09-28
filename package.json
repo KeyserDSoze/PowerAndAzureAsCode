@@ -6,7 +6,7 @@
     "src/frontend"
   ],
   "scripts": {
-    "dev": "npm --workspace @powerandazure/web run dev",
+    "dev": "npm --workspace @powerandazure/web run dev:azure",
     "build": "npm run build:azure",
     "build:powerapps": "npm --workspace @powerandazure/web run build:powerapps && node scripts/write-version.mjs",
     "build:powerpages": "npm --workspace @powerandazure/web run build:powerpages && node scripts/write-version.mjs",
@@ -16,7 +16,8 @@
     "rebrand": "node scripts/rebrand.mjs",
     "test:tooling": "node --test scripts/*.test.mjs",
     "test:platform": "node --experimental-strip-types --test tests/frontend-platform/operations.test.ts",
-    "configure:powerapps-ping": "node scripts/configure-powerapps-boilerplate-ping.mjs"
+    "configure:powerapps-ping": "node scripts/configure-powerapps-boilerplate-ping.mjs",
+    "dev:powerapps": "npm --workspace @powerandazure/web run dev:powerapps"
   },
   "engines": {
     "node": ">=22"
