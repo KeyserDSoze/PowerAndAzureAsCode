@@ -10,8 +10,9 @@ Usage:
     --publisher-prefix <2-8-char-prefix> \
     [--output-root src/backends/dataverse/solution]
 
-Creates a Dataverse solution project and adds a reference to the boilerplate
-Dataverse plug-in package project. Run this in a derived product repository.
+Creates the initial EMPTY Dataverse solution project for a derived product.
+The plug-in project reference is deliberately added only after the plug-in
+package has been registered in DEV once and the solution has been synchronized.
 EOF
 }
 
@@ -52,8 +53,17 @@ command -v pac >/dev/null 2>&1 || {
   exit 1
 }
 
+command -v node >/dev/null 2>&1 || {
+  echo "Node.js is required." >&2
+  exit 1
+}
+
+command -v dotnet >/dev/null 2>&1 || {
+  echo ".NET SDK is required." >&2
+  exit 1
+}
+
 SOLUTION_DIR="$OUTPUT_ROOT/$SOLUTION_NAME"
-PLUGIN_PROJECT="$(pwd)/src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins"
 
 if [[ -e "$SOLUTION_DIR" ]]; then
   echo "Solution directory already exists: $SOLUTION_DIR" >&2
@@ -67,21 +77,37 @@ pac solution init \
   --publisher-prefix "$PUBLISHER_PREFIX" \
   --outputDirectory "$SOLUTION_DIR"
 
-(
-  cd "$SOLUTION_DIR"
-  pac solution add-reference --path "$PLUGIN_PROJECT"
-)
+mapfile -t projects < <(find "$SOLUTION_DIR" -maxdepth 1 -type f -name '*.cdsproj' | sort)
+if [[ "${#projects[@]}" -ne 1 ]]; then
+  echo "Expected exactly one generated .cdsproj in $SOLUTION_DIR, found ${#projects[@]}." >&2
+  exit 1
+fi
+
+PROJECT="${projects[0]}"
+
+node scripts/pin-powerplatform-solution-package-cli.mjs "$PROJECT"
+dotnet restore "$PROJECT" --use-lock-file
 
 cat <<EOF
-Power Platform solution project created:
+Initial Power Platform solution project created:
   $SOLUTION_DIR
 
-Next:
-  1. Authenticate PAC CLI to the development Dataverse environment.
-  2. Build/import this solution into DEV.
-  3. Create the product Custom APIs and other Dataverse components in this solution.
-  4. Run 'pac solution sync' from the solution project and commit the generated source.
-  5. Configure the GitHub workflow variables documented in docs/19-power-platform-alm.md.
+First-time DEV sequence:
+  1. Verify PAC/Power Apps authentication with:
+       bash scripts/check-powerplatform-auth.sh
+  2. Build and import this EMPTY solution into DEV.
+  3. Build the plug-in package separately with a clean/non-incremental Release build.
+  4. Register that NuGet package ONCE with the Plug-in Registration Tool (PRT)
+     and add it to this solution.
+  5. Create the Custom APIs/parameters and bind them to the registered plug-in type.
+  6. Run 'pac solution sync' from this solution project and review the diff.
+  7. Only now add the plug-in project reference:
+       cd "$SOLUTION_DIR"
+       pac solution add-reference --path "$(pwd)/src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins"
+  8. Commit the synchronized solution source, .cdsproj and packages.lock.json.
+  9. Record the registered plug-in package ID as GitHub Environment variable
+       POWERPLATFORM_PLUGIN_PACKAGE_ID
+     for subsequent CI updates through 'pac plugin push'.
 
 Do not change the publisher prefix after product components have been created.
 EOF
