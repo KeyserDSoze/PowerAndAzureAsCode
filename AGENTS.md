@@ -13,7 +13,7 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 - Power Apps Code Apps + npm Power Apps CLI.
 - Power Pages Code Sites + optional Server Logic.
 - Azure Static Web Apps Standard when using a linked backend.
-- ASP.NET Core .NET 10.
+- ASP.NET Core .NET 10; repository tooling pins SDK feature band 10.0.4xx in `global.json`.
 - Dataverse.
 - GitHub Actions.
 - Microsoft Entra ID.
@@ -49,6 +49,11 @@ Maintain a reusable enterprise boilerplate for one React/TypeScript application 
 24. Cross-host business invariants belong in Dataverse Custom APIs/plugins under `src/backends/dataverse` unless an ADR explicitly selects another canonical backend.
 25. Dependency lockfiles are authoritative; CI/deploy workflows use `npm ci` and NuGet locked restore.
 26. The Azure API trusts `x-ms-client-principal` only as a linked Static Web Apps backend. Do not expose it behind anonymous App Service access without replacing the authentication design.
+27. Dataverse plug-in package projects in this template target `net462`; do not retarget them to `net48` without proving Dataverse package/solution compatibility.
+28. Power Apps unattended deployment MUST target a dedicated non-default Power Platform environment and MUST pass an explicit `--solution-id`.
+29. Treat `pa` and `pac` authentication as independent state; verify both before environment-writing local/admin commands.
+30. First-time Dataverse plug-in registration is a bootstrap exception: import the empty solution, register the package once with PRT, create/sync components, then add the plug-in project reference. Subsequent updates use the registered package ID.
+31. Rebranding MUST keep `brand.config.json` unchanged until path/content mutations have succeeded so interrupted runs remain recoverable.
 
 ## Repository map
 
