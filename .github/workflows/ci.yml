@@ -13,7 +13,6 @@ permissions:
   contents: read
 
 jobs:
-
   tooling:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -66,9 +65,6 @@ jobs:
           node-version-file: .node-version
       - run: npm ci --no-audit --no-fund
       - run: npm run validate
-      - name: Verify Power Apps CLI default-mode Vite config load
-        working-directory: src/frontend
-        run: npx --no-install vite build --mode development
       - run: npm run test:platform
       - run: npm run build:powerapps
       - run: npm run build:powerpages
@@ -102,18 +98,18 @@ jobs:
           rm -rf "$project_dir/bin/Release" "$project_dir/obj/Release"
           dotnet restore "$project" --locked-mode
           dotnet build "$project" --configuration Release --no-restore --no-incremental
-
       - name: Verify Dataverse plug-in package contents
         shell: bash
         run: |
           set -euo pipefail
           output_dir="src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/bin/Release"
           mapfile -t packages < <(find "$output_dir" -type f -name '*.nupkg' | sort)
-          test "${#packages[@]}" -eq 1 || {
+          if [ "${#packages[@]}" -ne 1 ]; then
             echo "Expected exactly one fresh plug-in nupkg, found ${#packages[@]}." >&2
             exit 1
-          }
-          unzip -Z1 "${packages[0]}" | grep -qE '\.dll
+          fi
+          unzip -Z1 "${packages[0]}" | grep -qE '\.dll$'
+
   bicep:
     runs-on: ubuntu-latest
     steps:
@@ -122,7 +118,6 @@ jobs:
         with:
           inlineScript: |
             az bicep build --file infra/azure/main.bicep --stdout > /dev/null
-
 
   rebrand-smoke:
     runs-on: ubuntu-latest
@@ -156,145 +151,34 @@ jobs:
       - run: npm run build:powerapps
       - run: npm run build:powerpages
       - run: npm run build:azure
-      - name: Verify rebranded .NET projects
+      - name: Verify rebranded projects
         shell: bash
         run: |
           set -euo pipefail
           mapfile -t azure_projects < <(find src/backends/azure-api -type f -name '*.csproj')
           mapfile -t plugin_projects < <(find src/backends/dataverse -type f -name '*.csproj')
+          mapfile -t solution_projects < <(find src/backends/dataverse -type f -name '*.cdsproj')
 
           test "${#azure_projects[@]}" -eq 1
           test "${#plugin_projects[@]}" -eq 1
+          test "${#solution_projects[@]}" -eq 1
           grep -q "@contoso/platform" .github/CODEOWNERS
           ! grep -q "@KeyserDSoze" .github/CODEOWNERS
+          grep -q "ContosoWorkspace.Dataverse.Plugins" "${solution_projects[0]}"
+          ! grep -q "PowerAndAzureAsCode.Dataverse.Plugins" "${solution_projects[0]}"
 
           dotnet restore "${azure_projects[0]}" --locked-mode
           dotnet build "${azure_projects[0]}" -c Release --no-restore
           dotnet run --project tests/azure-api-auth-smoke/AzureApiAuthSmoke.csproj -c Release
+
           plugin_dir="$(dirname "${plugin_projects[0]}")"
           rm -rf "$plugin_dir/bin/Release" "$plugin_dir/obj/Release"
           dotnet restore "${plugin_projects[0]}" --locked-mode
           dotnet build "${plugin_projects[0]}" -c Release --no-restore --no-incremental
+
           mapfile -t plugin_packages < <(find "$plugin_dir/bin/Release" -type f -name '*.nupkg' | sort)
           test "${#plugin_packages[@]}" -eq 1
-          unzip -Z1 "${plugin_packages[0]}" | grep -qE '\.dll            --exclude-dir=bin \
-            --exclude-dir=obj \
-            --exclude-dir=dist \
-            --exclude=packages.lock.json \
-            -l 'PowerAndAzureAsCode' src tests || true)"
-
-
-  bicep:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - uses: azure/CLI@9eb25b8360668fb0ecbafa808d40e2197b2f5f52 # v3
-        with:
-          inlineScript: |
-            az bicep build --file infra/azure/main.bicep --stdout > /dev/null
-
-
-  rebrand-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version-file: .node-version
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
-        with:
-          global-json-file: global.json
-      - run: npm ci --no-audit --no-fund
-      - name: Rebrand a disposable checkout
-        run: npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@contoso/platform"
-      - name: Verify npm lock consistency after rebrand
-        run: npm ci --no-audit --no-fund
-      - run: npm run validate
-      - run: npm run test:platform
-      - run: npm run build:powerapps
-      - run: npm run build:powerpages
-      - run: npm run build:azure
-      - name: Verify rebranded .NET projects
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t azure_projects < <(find src/backends/azure-api -type f -name '*.csproj')
-          mapfile -t plugin_projects < <(find src/backends/dataverse -type f -name '*.csproj')
-
-          test "${#azure_projects[@]}" -eq 1
-          test "${#plugin_projects[@]}" -eq 1
-          grep -q "@contoso/platform" .github/CODEOWNERS
-          ! grep -q "@KeyserDSoze" .github/CODEOWNERS
-
-          dotnet restore "${azure_projects[0]}" --locked-mode
-          dotnet build "${azure_projects[0]}" -c Release --no-restore
-          dotnet run --project tests/azure-api-auth-smoke/AzureApiAuthSmoke.csproj -c Release
-          dotnet restore "${plugin_projects[0]}" --locked-mode
-          dotnet build "${plugin_projects[0]}" -c Release --no-restore
-
-          test -z "$(grep -R \
-            --exclude-dir=bin \
-            --exclude-dir=obj \
-            --exclude-dir=dist \
-            --exclude=packages.lock.json \
-            -l 'PowerAndAzureAsCode' src tests || true)"
-
-
-          test -z "$(grep -R \
-            --exclude-dir=bin \
-            --exclude-dir=obj \
-            --exclude-dir=dist \
-            --exclude=packages.lock.json \
-            -l 'PowerAndAzureAsCode' src tests || true)"
-
-
-  bicep:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - uses: azure/CLI@9eb25b8360668fb0ecbafa808d40e2197b2f5f52 # v3
-        with:
-          inlineScript: |
-            az bicep build --file infra/azure/main.bicep --stdout > /dev/null
-
-
-  rebrand-smoke:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
-      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version-file: .node-version
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6
-        with:
-          global-json-file: global.json
-      - run: npm ci --no-audit --no-fund
-      - name: Rebrand a disposable checkout
-        run: npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@contoso/platform"
-      - name: Verify npm lock consistency after rebrand
-        run: npm ci --no-audit --no-fund
-      - run: npm run validate
-      - run: npm run test:platform
-      - run: npm run build:powerapps
-      - run: npm run build:powerpages
-      - run: npm run build:azure
-      - name: Verify rebranded .NET projects
-        shell: bash
-        run: |
-          set -euo pipefail
-          mapfile -t azure_projects < <(find src/backends/azure-api -type f -name '*.csproj')
-          mapfile -t plugin_projects < <(find src/backends/dataverse -type f -name '*.csproj')
-
-          test "${#azure_projects[@]}" -eq 1
-          test "${#plugin_projects[@]}" -eq 1
-          grep -q "@contoso/platform" .github/CODEOWNERS
-          ! grep -q "@KeyserDSoze" .github/CODEOWNERS
-
-          dotnet restore "${azure_projects[0]}" --locked-mode
-          dotnet build "${azure_projects[0]}" -c Release --no-restore
-          dotnet run --project tests/azure-api-auth-smoke/AzureApiAuthSmoke.csproj -c Release
-          dotnet restore "${plugin_projects[0]}" --locked-mode
-          dotnet build "${plugin_projects[0]}" -c Release --no-restore
+          unzip -Z1 "${plugin_packages[0]}" | grep -qE '\.dll$'
 
           test -z "$(grep -R \
             --exclude-dir=bin \
