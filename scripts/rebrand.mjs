@@ -168,6 +168,13 @@ for (const file of files) {
 const rootPackagePath = resolve("package.json");
 const rootPackage = JSON.parse(await readFile(rootPackagePath, "utf8"));
 rootPackage.name = toPackageName(displayName);
+if (rootPackage.scripts && typeof rootPackage.scripts === "object") {
+  for (const [name, command] of Object.entries(rootPackage.scripts)) {
+    if (typeof command === "string") {
+      rootPackage.scripts[name] = command.replaceAll(oldScope, scope);
+    }
+  }
+}
 await writeFile(rootPackagePath, JSON.stringify(rootPackage, null, 2) + "\n");
 
 const frontendPackagePath = resolve("src/frontend/package.json");
@@ -185,6 +192,13 @@ if (packageLock.packages?.[""]) {
 
 if (packageLock.packages?.["src/frontend"]) {
   packageLock.packages["src/frontend"].name = frontendPackage.name;
+}
+
+const oldWorkspaceLink = `node_modules/${oldScope}/web`;
+const newWorkspaceLink = `node_modules/${scope}/web`;
+if (packageLock.packages?.[oldWorkspaceLink]) {
+  packageLock.packages[newWorkspaceLink] = packageLock.packages[oldWorkspaceLink];
+  delete packageLock.packages[oldWorkspaceLink];
 }
 
 await writeFile(packageLockPath, JSON.stringify(packageLock, null, 2) + "\n");
