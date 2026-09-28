@@ -40,17 +40,23 @@ PA_CLI_SP_CLIENT_ID
 
 This is the App Registration application/client ID, not the Enterprise Application object ID.
 
+#### `POWERAPPS_ENVIRONMENT_NAME`
+
+Required non-secret display/name value for the dedicated target Power Platform environment.
+
+The provided unattended deployment workflow rejects values beginning with `Default-`. CI publishing of Code Apps is intentionally unsupported by this template in a default Power Platform environment because the required service-principal sharing/access path could not be completed reliably in field testing.
+
 #### `POWERAPPS_SOLUTION_ID`
 
-Optional.
+Required.
 
-Power Platform Solution ID used when publishing the Code App into a solution:
+Power Platform Solution GUID used for every Code App publish:
 
 ```bash
 npx --no-install pa app push --solution-id <value>
 ```
 
-Leave empty if the application is not being pushed into a solution.
+The workflow fails when this value is empty instead of allowing the CLI to select an environment-preferred solution implicitly.
 
 #### `POWERAPPS_AUTO_DEPLOY` (repository-level variable)
 
@@ -307,12 +313,27 @@ The Dataverse solution deployment workflow uses GitHub Environment variables:
 - `POWERPLATFORM_SOLUTION_PATH` (optional; defaults to `src/backends/dataverse/solution`)
 - `POWERPLATFORM_SOLUTION_PACKAGE_TYPE` (optional; `managed` or `unmanaged`)
 - `POWERPLATFORM_SOLUTION_SETTINGS_FILE` (optional repository-relative path to a PAC deployment settings JSON file)
+- `POWERPLATFORM_PLUGIN_PACKAGE_ID` (required after the one-time DEV registration; Dataverse plug-in package GUID used by `pac plugin push`)
 
 Repository-level deployment guard:
 
 - `POWERPLATFORM_SOLUTION_AUTO_DEPLOY`
 
 The deployment identity uses GitHub OIDC/FIC; no client secret is required by this workflow.
+
+---
+
+## CodeQL / private repositories
+
+Public repositories run CodeQL by default.
+
+For a **private** derived repository, first enable GitHub Code Security/code scanning for the repository/organization, then set the repository-level variable:
+
+```text
+CODEQL_ENABLED=true
+```
+
+The CodeQL workflow requests `actions: read` because private-repository analysis requires it. Private repositories without `CODEQL_ENABLED=true` skip the CodeQL analysis job rather than failing during result upload when code scanning is unavailable.
 
 ---
 
