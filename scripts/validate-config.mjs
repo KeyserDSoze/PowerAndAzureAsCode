@@ -25,6 +25,8 @@ const requiredFiles = [
   "scripts/bootstrap-powerplatform-solution.sh",
   "scripts/check-powerplatform-auth.sh",
   "scripts/pin-powerplatform-solution-package-cli.mjs",
+  "scripts/powerapps-deployment-target.mjs",
+  "scripts/validate-powerapps-deployment-target.mjs",
   "scripts/bootstrap-github-repository.sh",
   "scripts/verify-github-repository.sh",
   "scripts/install-powerpages-server-logic-example.mjs",
@@ -164,11 +166,29 @@ for (const requiredSnippet of [
   "POWERAPPS_ENVIRONMENT_NAME",
   "POWERAPPS_SOLUTION_ID",
   "--solution-id",
-  "Default-*"
+  "validate-powerapps-deployment-target.mjs"
 ]) {
   if (!powerAppsDeployWorkflow.includes(requiredSnippet)) {
     throw new Error(
       `Power Apps deployment workflow is missing field-tested guard '${requiredSnippet}'.`
+    );
+  }
+}
+
+
+const powerAppsTargetValidator = await readFile(
+  resolve("scripts/powerapps-deployment-target.mjs"),
+  "utf8"
+);
+
+for (const requiredSnippet of [
+  "Default-",
+  "POWERAPPS_SOLUTION_ID",
+  "dedicated non-default environment"
+]) {
+  if (!powerAppsTargetValidator.includes(requiredSnippet)) {
+    throw new Error(
+      `Power Apps deployment target validation is missing field-tested guard '${requiredSnippet}'.`
     );
   }
 }
