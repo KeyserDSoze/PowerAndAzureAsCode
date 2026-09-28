@@ -95,7 +95,7 @@ It invokes the same Dataverse Custom API through `Server.Connector.Dataverse.Inv
 dotnet build src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj -c Release
 ```
 
-The plug-in project targets .NET Framework 4.8 because Dataverse plug-ins execute in the Dataverse sandbox. The Azure API remains .NET 10; these are two different runtimes by design.
+The plug-in project targets .NET Framework 4.6.2 (`net462`) because that target is compatible with the Dataverse plug-in-package/solution tooling verified by this template. The Azure API remains .NET 10; these are two different runtimes by design.
 
 ## Deployment
 
