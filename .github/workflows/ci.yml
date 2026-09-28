@@ -132,6 +132,18 @@ jobs:
         with:
           global-json-file: global.json
       - run: npm ci --no-audit --no-fund
+      - name: Create derived-solution rebrand fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p src/backends/dataverse/solution/SmokeSolution
+          cat > src/backends/dataverse/solution/SmokeSolution/SmokeSolution.cdsproj <<'EOF'
+          <Project Sdk="Microsoft.NET.Sdk">
+            <ItemGroup>
+              <ProjectReference Include="../../PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj" />
+            </ItemGroup>
+          </Project>
+          EOF
       - name: Rebrand a disposable checkout
         run: npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@contoso/platform"
       - name: Verify npm lock consistency after rebrand
