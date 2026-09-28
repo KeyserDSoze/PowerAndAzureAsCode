@@ -34,6 +34,7 @@ jobs:
       PA_CLI_SP_CLIENT_ID: ${{ vars.POWERAPPS_CLIENT_ID }}
       PA_CLI_SP_TENANT_ID: ${{ vars.POWERAPPS_TENANT_ID }}
       PA_CLI_SP_CLIENT_SECRET: ${{ secrets.POWERAPPS_CLIENT_SECRET }}
+      POWERAPPS_ENVIRONMENT_NAME: ${{ vars.POWERAPPS_ENVIRONMENT_NAME }}
       POWERAPPS_SOLUTION_ID: ${{ vars.POWERAPPS_SOLUTION_ID }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -41,18 +42,43 @@ jobs:
         with:
           node-version-file: .node-version
       - run: npm ci --no-audit --no-fund
+
+      - name: Validate deployment target
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          test -n "$POWERAPPS_ENVIRONMENT_NAME" || {
+            echo "POWERAPPS_ENVIRONMENT_NAME is required." >&2
+            exit 1
+          }
+
+          case "$POWERAPPS_ENVIRONMENT_NAME" in
+            Default-*|default-*)
+              echo "Unattended Code App deployment is not supported by this template for a default Power Platform environment. Use a dedicated non-default environment." >&2
+              exit 1
+              ;;
+          esac
+
+          test -n "$POWERAPPS_SOLUTION_ID" || {
+            echo "POWERAPPS_SOLUTION_ID is required so the app cannot be pushed into an unintended preferred solution." >&2
+            exit 1
+          }
+
+          if [[ ! "$POWERAPPS_SOLUTION_ID" =~ ^[0-9a-fA-F-]{36}$ ]]; then
+            echo "POWERAPPS_SOLUTION_ID must be a solution GUID." >&2
+            exit 1
+          fi
+
       - name: Verify locked Power Apps CLI
         working-directory: src/frontend
         run: npx --no-install pa --version
+
       - run: npm run build:powerapps
+
       - name: Validate initialized Code App
         run: test -f src/frontend/power.config.json || (echo "Run 'pa app init' in src/frontend and commit power.config.json in the derived application repository." && exit 1)
-      - name: Publish
+
+      - name: Publish to explicit solution
         working-directory: src/frontend
-        shell: bash
-        run: |
-          if [ -n "$POWERAPPS_SOLUTION_ID" ]; then
-            npx --no-install pa app push --non-interactive --solution-id "$POWERAPPS_SOLUTION_ID"
-          else
-            npx --no-install pa app push --non-interactive
-          fi
+        run: npx --no-install pa app push --non-interactive --solution-id "$POWERAPPS_SOLUTION_ID"
