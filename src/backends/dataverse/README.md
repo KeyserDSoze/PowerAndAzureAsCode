@@ -91,14 +91,25 @@ It invokes the same Dataverse Custom API through `Server.Connector.Dataverse.Inv
 
 ## Build
 
+For a package that will be registered or pushed, do not rely on an incremental Release build. Remove Release output and force a fresh package:
+
 ```bash
-dotnet build src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj -c Release
+PLUGIN_DIR=src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins
+rm -rf "$PLUGIN_DIR/bin/Release" "$PLUGIN_DIR/obj/Release"
+dotnet restore "$PLUGIN_DIR/PowerAndAzureAsCode.Dataverse.Plugins.csproj" --locked-mode
+dotnet build "$PLUGIN_DIR/PowerAndAzureAsCode.Dataverse.Plugins.csproj" -c Release --no-restore --no-incremental
 ```
+
+Inspect the generated `.nupkg` before upload.
 
 The plug-in project targets .NET Framework 4.6.2 (`net462`) because that target is compatible with the Dataverse plug-in-package/solution tooling verified by this template. The Azure API remains .NET 10; these are two different runtimes by design.
 
 ## Deployment
 
-In a derived product, put the plug-in assembly and Custom API definition in the product's Power Platform solution and promote them through normal Power Platform ALM.
+The **first** DEV registration is a bootstrap step: import the empty product solution, register the fresh NuGet package once with the Plug-in Registration Tool, then create/bind Custom APIs and sync the solution. After that registration exists, CI can update it with `pac plugin push --pluginId ... --pluginFile <fresh nupkg>`.
+
+See `docs/19-power-platform-alm.md` for the exact first-time and repeatable flows.
+
+In a derived product, keep the plug-in package and Custom API definition in the product's Power Platform solution and promote them through normal Power Platform ALM.
 
 Do not move cross-host business rules back into React merely because Power Apps can perform direct CRUD.
