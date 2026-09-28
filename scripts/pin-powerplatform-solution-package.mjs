@@ -14,7 +14,8 @@ export function pinSolutionBuildPackage(content) {
 
   return content.replace(
     pattern,
-    `$1${solutionBuildPackageVersion}$2`
+    (_match, prefix, suffix) =>
+      `${prefix}${solutionBuildPackageVersion}${suffix}`
   );
 }
 
