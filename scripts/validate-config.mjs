@@ -154,6 +154,64 @@ for (const entry of await readdir(workflowDir, { withFileTypes: true })) {
   }
 }
 
+
+const powerAppsDeployWorkflow = await readFile(
+  resolve(".github/workflows/deploy-powerapps.yml"),
+  "utf8"
+);
+
+for (const requiredSnippet of [
+  "POWERAPPS_ENVIRONMENT_NAME",
+  "POWERAPPS_SOLUTION_ID",
+  "--solution-id",
+  "Default-*"
+]) {
+  if (!powerAppsDeployWorkflow.includes(requiredSnippet)) {
+    throw new Error(
+      `Power Apps deployment workflow is missing field-tested guard '${requiredSnippet}'.`
+    );
+  }
+}
+
+if (powerAppsDeployWorkflow.includes("pa app push --non-interactive\n")) {
+  throw new Error(
+    "Power Apps deployment workflow must never fall back to pa app push without --solution-id."
+  );
+}
+
+const solutionDeployWorkflow = await readFile(
+  resolve(".github/workflows/deploy-powerplatform-solution.yml"),
+  "utf8"
+);
+
+for (const requiredSnippet of [
+  "POWERPLATFORM_PLUGIN_PACKAGE_ID",
+  "pac plugin push",
+  "--no-incremental",
+  "--locked-mode"
+]) {
+  if (!solutionDeployWorkflow.includes(requiredSnippet)) {
+    throw new Error(
+      `Power Platform solution workflow is missing field-tested guard '${requiredSnippet}'.`
+    );
+  }
+}
+
+const codeqlWorkflow = await readFile(
+  resolve(".github/workflows/codeql.yml"),
+  "utf8"
+);
+
+if (!codeqlWorkflow.includes("actions: read")) {
+  throw new Error("CodeQL workflow must request actions: read for private repositories.");
+}
+
+if (!codeqlWorkflow.includes("CODEQL_ENABLED")) {
+  throw new Error(
+    "CodeQL workflow must explicitly gate private-repository analysis on CODEQL_ENABLED."
+  );
+}
+
 await assertNoForbiddenChatCitationTokens(resolve("."));
 
 console.log("Configuration and template invariants validation passed.");
