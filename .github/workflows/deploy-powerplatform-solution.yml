@@ -33,6 +33,8 @@ jobs:
       SOLUTION_ROOT: ${{ vars.POWERPLATFORM_SOLUTION_PATH || 'src/backends/dataverse/solution' }}
       PACKAGE_TYPE: ${{ vars.POWERPLATFORM_SOLUTION_PACKAGE_TYPE || 'unmanaged' }}
       SETTINGS_FILE: ${{ vars.POWERPLATFORM_SOLUTION_SETTINGS_FILE }}
+      PLUGIN_PACKAGE_ID: ${{ vars.POWERPLATFORM_PLUGIN_PACKAGE_ID }}
+      PLUGIN_PROJECT: src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
 
@@ -46,12 +48,56 @@ jobs:
       - name: Authenticate PAC with GitHub federation
         shell: bash
         run: |
+          set -euo pipefail
           pac auth create \
             --tenant "${{ vars.POWERPLATFORM_DEPLOY_TENANT_ID }}" \
             --applicationId "${{ vars.POWERPLATFORM_DEPLOY_CLIENT_ID }}" \
             --githubFederated \
             --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}"
           pac auth who
+
+      - name: Validate registered plug-in package
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$PLUGIN_PACKAGE_ID" || {
+            echo "POWERPLATFORM_PLUGIN_PACKAGE_ID is required after the one-time PRT registration in DEV." >&2
+            echo "Follow docs/19-power-platform-alm.md before using this workflow." >&2
+            exit 1
+          }
+
+      - name: Build fresh plug-in package
+        id: plugin
+        shell: bash
+        run: |
+          set -euo pipefail
+          plugin_dir="$(dirname "$PLUGIN_PROJECT")"
+          rm -rf "$plugin_dir/bin/Release" "$plugin_dir/obj/Release"
+
+          dotnet restore "$PLUGIN_PROJECT" --locked-mode
+          dotnet build "$PLUGIN_PROJECT" \
+            --configuration Release \
+            --no-restore \
+            --no-incremental
+
+          mapfile -t packages < <(find "$plugin_dir/bin/Release" -type f -name '*.nupkg' | sort)
+          if [ "${#packages[@]}" -ne 1 ]; then
+            echo "Expected exactly one fresh plug-in nupkg, found ${#packages[@]}." >&2
+            exit 1
+          fi
+
+          unzip -Z1 "${packages[0]}" | grep -qE '\.dll$'
+          echo "path=${packages[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Push registered plug-in package update
+        shell: bash
+        run: |
+          set -euo pipefail
+          pac plugin push \
+            --pluginId "$PLUGIN_PACKAGE_ID" \
+            --pluginFile "${{ steps.plugin.outputs.path }}" \
+            --type Nuget \
+            --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}"
 
       - name: Locate solution project
         id: solution
@@ -66,6 +112,9 @@ jobs:
           fi
           echo "project=${projects[0]}" >> "$GITHUB_OUTPUT"
           echo "project_dir=$(dirname "${projects[0]}")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore locked solution project
+        run: dotnet restore "${{ steps.solution.outputs.project }}" --locked-mode
 
       - name: Build solution
         shell: bash
@@ -83,6 +132,7 @@ jobs:
 
           dotnet build "${{ steps.solution.outputs.project }}" \
             --configuration Release \
+            --no-restore \
             -p:SolutionPackageType="$solution_package_type"
 
       - name: Locate package
