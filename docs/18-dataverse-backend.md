@@ -107,6 +107,12 @@ cd ../..
 npm run configure:powerapps-ping -- --api-name <publisher-prefix>_BoilerplatePing
 ```
 
+Windows PowerShell:
+
+```powershell
+npm.cmd run configure:powerapps-ping -- --api-name <publisher-prefix>_BoilerplatePing
+```
+
 
 ## ALM
 
