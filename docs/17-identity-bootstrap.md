@@ -265,6 +265,8 @@ to the same Entra app registration.
 
 ## 7. Power Platform GitHub federation
 
+For local/admin work, remember that `pa` and `pac` authentication are independent. Run `bash scripts/check-powerplatform-auth.sh` before environment-writing operations.
+
 For PAC CLI deployments, a separate OIDC deployment identity can be bootstrapped:
 
 ```bash
@@ -281,6 +283,8 @@ The role must be explicitly supplied.
 The script creates/reuses the Entra app and service principal, creates the FIC only for the explicitly selected GitHub Environment, and assigns the application user only to the target Dataverse environment. Run it separately for each environment that needs deployment trust.
 
 No deployment client secret is created.
+
+If the same Power Platform environment will host a Code App deployed from CI, use a **dedicated non-default environment**. The template does not support unattended Code App deployment to the tenant's `Default-*` environment.
 
 ---
 
