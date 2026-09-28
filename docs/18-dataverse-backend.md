@@ -73,13 +73,13 @@ Root folders intentionally left outside `src`:
 
 ## Dataverse plug-in runtime
 
-Dataverse plug-in assemblies are not .NET 10 ASP.NET Core projects. Microsoft currently supports Dataverse plug-ins on .NET Framework and recommends .NET Framework 4.8 for new plug-in code.
+Dataverse plug-in assemblies are not .NET 10 ASP.NET Core projects. This template targets **.NET Framework 4.6.2 (`net462`)** for Dataverse plug-in packages. The framework is intentionally aligned with the package/solution tooling path verified against Dataverse; do not raise it to `net48` just because the Azure API uses a newer runtime.
 
 The boilerplate therefore deliberately contains:
 
 ```text
 src/backends/azure-api/...        -> .NET 10
-src/backends/dataverse/...        -> .NET Framework 4.8
+src/backends/dataverse/...        -> .NET Framework 4.6.2 (net462)
 ```
 
 They solve different runtime concerns.
