@@ -23,6 +23,10 @@ const requiredFiles = [
   "scripts/bootstrap-azure-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-solution.sh",
+  "scripts/check-powerplatform-auth.sh",
+  "scripts/pin-powerplatform-solution-package-cli.mjs",
+  "scripts/powerapps-deployment-target.mjs",
+  "scripts/validate-powerapps-deployment-target.mjs",
   "scripts/bootstrap-github-repository.sh",
   "scripts/verify-github-repository.sh",
   "scripts/install-powerpages-server-logic-example.mjs",
@@ -85,8 +89,31 @@ if (!nodeVersion || nodeVersion !== nvmVersion) {
 }
 
 const globalJson = JSON.parse(await readFile(resolve("global.json"), "utf8"));
-if (!/^10\.0\.\d+$/.test(globalJson?.sdk?.version ?? "")) {
-  throw new Error("global.json must pin an explicit .NET 10 SDK version.");
+if (!/^10\.0\.4\d{2}$/.test(globalJson?.sdk?.version ?? "")) {
+  throw new Error("global.json must pin the .NET 10.0.4xx SDK feature band.");
+}
+
+if (globalJson?.sdk?.rollForward !== "latestPatch") {
+  throw new Error("global.json must keep rollForward=latestPatch for the pinned 10.0.4xx feature band.");
+}
+
+if (!frontendPackage.scripts?.dev?.includes("--mode powerapps") ||
+    !frontendPackage.scripts?.dev?.includes("--port 3000") ||
+    !frontendPackage.scripts?.dev?.includes("--strictPort")) {
+  throw new Error("src/frontend npm dev must start the Power Apps Vite host on strict port 3000.");
+}
+
+if (!rootPackage.scripts?.["dev:powerapps"] || !frontendPackage.scripts?.["dev:azure"]) {
+  throw new Error("Root/frontend package scripts must expose explicit Power Apps and Azure dev commands.");
+}
+
+const pluginProject = await readFile(
+  resolve("src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj"),
+  "utf8"
+);
+
+if (!pluginProject.includes("<TargetFramework>net462</TargetFramework>")) {
+  throw new Error("Dataverse plug-in package must target net462 for package/solution compatibility.");
 }
 
 for (const envFile of [
@@ -127,6 +154,82 @@ for (const entry of await readdir(workflowDir, { withFileTypes: true })) {
       );
     }
   }
+}
+
+
+const powerAppsDeployWorkflow = await readFile(
+  resolve(".github/workflows/deploy-powerapps.yml"),
+  "utf8"
+);
+
+for (const requiredSnippet of [
+  "POWERAPPS_ENVIRONMENT_NAME",
+  "POWERAPPS_SOLUTION_ID",
+  "--solution-id",
+  "validate-powerapps-deployment-target.mjs"
+]) {
+  if (!powerAppsDeployWorkflow.includes(requiredSnippet)) {
+    throw new Error(
+      `Power Apps deployment workflow is missing field-tested guard '${requiredSnippet}'.`
+    );
+  }
+}
+
+
+const powerAppsTargetValidator = await readFile(
+  resolve("scripts/powerapps-deployment-target.mjs"),
+  "utf8"
+);
+
+for (const requiredSnippet of [
+  "Default-",
+  "POWERAPPS_SOLUTION_ID",
+  "dedicated non-default environment"
+]) {
+  if (!powerAppsTargetValidator.includes(requiredSnippet)) {
+    throw new Error(
+      `Power Apps deployment target validation is missing field-tested guard '${requiredSnippet}'.`
+    );
+  }
+}
+
+if (powerAppsDeployWorkflow.includes("pa app push --non-interactive\n")) {
+  throw new Error(
+    "Power Apps deployment workflow must never fall back to pa app push without --solution-id."
+  );
+}
+
+const solutionDeployWorkflow = await readFile(
+  resolve(".github/workflows/deploy-powerplatform-solution.yml"),
+  "utf8"
+);
+
+for (const requiredSnippet of [
+  "POWERPLATFORM_PLUGIN_PACKAGE_ID",
+  "pac plugin push",
+  "--no-incremental",
+  "--locked-mode"
+]) {
+  if (!solutionDeployWorkflow.includes(requiredSnippet)) {
+    throw new Error(
+      `Power Platform solution workflow is missing field-tested guard '${requiredSnippet}'.`
+    );
+  }
+}
+
+const codeqlWorkflow = await readFile(
+  resolve(".github/workflows/codeql.yml"),
+  "utf8"
+);
+
+if (!codeqlWorkflow.includes("actions: read")) {
+  throw new Error("CodeQL workflow must request actions: read for private repositories.");
+}
+
+if (!codeqlWorkflow.includes("CODEQL_ENABLED")) {
+  throw new Error(
+    "CodeQL workflow must explicitly gate private-repository analysis on CODEQL_ENABLED."
+  );
 }
 
 await assertNoForbiddenChatCitationTokens(resolve("."));

@@ -4,11 +4,13 @@
   "version": "0.0.1",
   "type": "module",
   "scripts": {
-    "dev": "vite --mode azure",
+    "dev": "vite --mode powerapps --port 3000 --strictPort",
     "build:powerapps": "tsc --noEmit -p tsconfig.powerapps.json && vite build --mode powerapps",
     "build:powerpages": "tsc --noEmit -p tsconfig.powerpages.json && vite build --mode powerpages",
     "build:azure": "tsc --noEmit -p tsconfig.azure.json && vite build --mode azure",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:powerapps": "vite --mode powerapps --port 3000 --strictPort",
+    "dev:azure": "vite --mode azure"
   },
   "dependencies": {
     "@microsoft/power-apps": "^1.3.0",

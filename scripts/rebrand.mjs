@@ -46,10 +46,65 @@ const oldCodeName = toCodeName(oldDisplayName);
 const oldScope = config.npmScope;
 const newCodeName = toCodeName(displayName);
 
-config.productName = displayName;
-config.shortName = newCodeName.slice(0, 24);
-config.npmScope = scope;
-await writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
+const ignoredDirectories = new Set([
+  ".git",
+  "node_modules",
+  "dist",
+  "bin",
+  "obj",
+  "artifacts",
+  ".powerpages-site"
+]);
+
+const textExtensions = new Set([
+  ".md", ".json", ".ts", ".tsx", ".js", ".mjs", ".yml", ".yaml",
+  ".cs", ".csproj", ".cdsproj", ".bicep", ".sh", ".html", ".xml", ".config"
+]);
+
+async function walk(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const result = [];
+
+  for (const entry of entries) {
+    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+
+    const full = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      result.push(...(await walk(full)));
+    } else {
+      result.push(full);
+    }
+  }
+
+  return result;
+}
+
+async function renameMatchingPaths(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
+
+    const current = join(directory, entry.name);
+
+    if (entry.isDirectory()) {
+      await renameMatchingPaths(current);
+    }
+
+    if (entry.name.includes(oldCodeName)) {
+      const renamed = join(
+        directory,
+        entry.name.replaceAll(oldCodeName, newCodeName)
+      );
+      await rename(current, renamed);
+    }
+  }
+}
+
+// Rename filesystem paths before changing the branding source of truth.
+// If a rename fails (for example because an editor locks a directory), the
+// repository can be cleaned and the command rerun with the original config.
+await renameMatchingPaths(resolve("src"));
 
 const displayFiles = [
   "src/frontend/index.html",
@@ -81,47 +136,26 @@ if (codeOwner) {
   await writeFile(codeOwnersPath, codeOwners);
 }
 
-const ignoredDirectories = new Set([
-  ".git",
-  "node_modules",
-  "dist",
-  "bin",
-  "obj",
-  "artifacts",
-  ".powerpages-site"
-]);
-
-const textExtensions = new Set([
-  ".md", ".json", ".ts", ".tsx", ".js", ".mjs", ".yml", ".yaml",
-  ".cs", ".csproj", ".bicep", ".sh", ".html", ".xml", ".config"
-]);
-
 const displayFileSet = new Set(displayFiles.map((file) => resolve(file)));
-
-async function walk(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-  const result = [];
-
-  for (const entry of entries) {
-    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
-
-    const full = join(directory, entry.name);
-    if (entry.isDirectory()) {
-      result.push(...(await walk(full)));
-    } else {
-      result.push(full);
-    }
-  }
-
-  return result;
-}
+const separatelyManagedFiles = new Set([
+  configPath,
+  resolve("package.json"),
+  resolve("src/frontend/package.json"),
+  resolve("package-lock.json")
+]);
 
 const files = await walk(resolve("."));
 
 for (const file of files) {
-  if (displayFileSet.has(file) || !textExtensions.has(extname(file))) continue;
+  if (
+    displayFileSet.has(file) ||
+    separatelyManagedFiles.has(file) ||
+    !textExtensions.has(extname(file))
+  ) {
+    continue;
+  }
 
-  let content = await readFile(file, "utf8");
+  const content = await readFile(file, "utf8");
   const next = content
     .replaceAll(oldCodeName, newCodeName)
     .replaceAll(oldScope, scope);
@@ -134,6 +168,13 @@ for (const file of files) {
 const rootPackagePath = resolve("package.json");
 const rootPackage = JSON.parse(await readFile(rootPackagePath, "utf8"));
 rootPackage.name = toPackageName(displayName);
+if (rootPackage.scripts && typeof rootPackage.scripts === "object") {
+  for (const [name, command] of Object.entries(rootPackage.scripts)) {
+    if (typeof command === "string") {
+      rootPackage.scripts[name] = command.replaceAll(oldScope, scope);
+    }
+  }
+}
 await writeFile(rootPackagePath, JSON.stringify(rootPackage, null, 2) + "\n");
 
 const frontendPackagePath = resolve("src/frontend/package.json");
@@ -153,31 +194,21 @@ if (packageLock.packages?.["src/frontend"]) {
   packageLock.packages["src/frontend"].name = frontendPackage.name;
 }
 
-await writeFile(packageLockPath, JSON.stringify(packageLock, null, 2) + "\n");
-
-async function renameMatchingPaths(directory) {
-  const entries = await readdir(directory, { withFileTypes: true });
-
-  for (const entry of entries) {
-    if (entry.isDirectory() && ignoredDirectories.has(entry.name)) continue;
-
-    const current = join(directory, entry.name);
-
-    if (entry.isDirectory()) {
-      await renameMatchingPaths(current);
-    }
-
-    if (entry.name.includes(oldCodeName)) {
-      const renamed = join(
-        directory,
-        entry.name.replaceAll(oldCodeName, newCodeName)
-      );
-      await rename(current, renamed);
-    }
-  }
+const oldWorkspaceLink = `node_modules/${oldScope}/web`;
+const newWorkspaceLink = `node_modules/${scope}/web`;
+if (packageLock.packages?.[oldWorkspaceLink]) {
+  packageLock.packages[newWorkspaceLink] = packageLock.packages[oldWorkspaceLink];
+  delete packageLock.packages[oldWorkspaceLink];
 }
 
-await renameMatchingPaths(resolve("src"));
+await writeFile(packageLockPath, JSON.stringify(packageLock, null, 2) + "\n");
+
+// Commit the source-of-truth branding file last. Until this write succeeds,
+// rerunning the command still knows the original code name and scope.
+config.productName = displayName;
+config.shortName = newCodeName.slice(0, 24);
+config.npmScope = scope;
+await writeFile(configPath, JSON.stringify(config, null, 2) + "\n");
 
 console.log(`Display name: ${displayName}`);
 console.log(`Code identifier: ${newCodeName}`);

@@ -115,3 +115,100 @@ Set the correct repository-level variable to the literal `true`:
 - `POWERPLATFORM_SOLUTION_AUTO_DEPLOY`
 
 Or run the workflow manually.
+
+
+## Power Apps local host times out or starts the Azure adapter
+
+The frontend workspace `npm run dev` must remain the Power Apps-specific dev command:
+
+```text
+vite --mode powerapps --port 3000 --strictPort
+```
+
+Run `npx --no-install pa app run` from `src/frontend`. Repository-root `npm run dev` intentionally uses Azure mode; `npm run dev:powerapps` starts only the Power Apps Vite process for diagnostics.
+
+If Vite reports an unsupported `development` mode while Power Apps CLI is inspecting the config, verify the repository's current `vite.config.ts` fallback has not been removed.
+
+## pa and pac point at different tenants
+
+They are separate CLIs with separate authentication state.
+
+From the repository root run:
+
+```bash
+bash scripts/check-powerplatform-auth.sh
+```
+
+Do this before commands that create/share/push Code Apps, register/sync/import solutions, or otherwise mutate Power Platform resources.
+
+## Power Apps unattended deploy fails in a Default-* environment
+
+The template does not support CI Code App deployment to the Power Platform default environment. Use a dedicated non-default environment.
+
+Configure:
+
+```text
+POWERAPPS_ENVIRONMENT_NAME=<dedicated environment name>
+POWERAPPS_SOLUTION_ID=<product solution guid>
+```
+
+The deployment workflow rejects `Default-*` and a missing solution GUID before publishing.
+
+## Rebrand stopped halfway
+
+A local editor/process may have locked a path during rename.
+
+Close the locking process, inspect `git status`, preserve any intentional work, then reset a disposable working tree if appropriate:
+
+```bash
+git restore .
+git clean -fd
+```
+
+Rerun the same rebrand command. The script writes `brand.config.json` last specifically so the original name remains available after a partial failure.
+
+## Dataverse plug-in package is rejected or stale
+
+The template plug-in project must target `net462`.
+
+Before registration/update, delete Release output and build non-incrementally:
+
+```bash
+PLUGIN_DIR=src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins
+rm -rf "$PLUGIN_DIR/bin/Release" "$PLUGIN_DIR/obj/Release"
+dotnet restore "$PLUGIN_DIR/PowerAndAzureAsCode.Dataverse.Plugins.csproj" --locked-mode
+dotnet build "$PLUGIN_DIR/PowerAndAzureAsCode.Dataverse.Plugins.csproj" -c Release --no-restore --no-incremental
+```
+
+Inspect the newly generated `.nupkg`. The CI/deployment workflows do the same clean build to avoid reusing an older package.
+
+## First solution build fails because the plug-in is not registered
+
+Do not add the plug-in project reference during the first solution bootstrap.
+
+Follow the first-time sequence in `19-power-platform-alm.md`: import the empty solution, register the NuGet package once with PRT, create/bind Custom APIs, sync the solution, then add the plug-in project reference. Subsequent updates use `pac plugin push --pluginId ...`.
+
+## CodeQL fails only in a private repository
+
+Private repositories need `actions: read` and code scanning must be enabled.
+
+The template includes `actions: read`. Enable GitHub Code Security/code scanning for the private repository and set:
+
+```text
+CODEQL_ENABLED=true
+```
+
+Without that variable the private-repository CodeQL job is intentionally skipped.
+
+## A compatible .NET SDK was not found
+
+The repository pins the **10.0.4xx** SDK feature band in `global.json` with `rollForward=latestPatch`.
+
+Install a 10.0.4xx SDK and verify:
+
+```bash
+dotnet --list-sdks
+dotnet --info
+```
+
+A generic 10.0.3xx install does not satisfy this repository pin.

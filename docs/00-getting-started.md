@@ -17,7 +17,7 @@ Common:
 
 Azure target:
 
-- .NET 10 SDK.
+- .NET SDK **10.0.4xx** (the feature band pinned by `global.json`; `latestPatch` is allowed within that band).
 - Azure subscription.
 - Azure CLI for local infrastructure work.
 
@@ -53,11 +53,21 @@ dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.
 
 ## Rebrand before first deployment
 
+Bash/macOS/Linux:
+
 ```bash
 npm run rebrand -- --name "Contoso Workspace" --scope "@contoso"
 ```
 
+Windows PowerShell:
+
+```powershell
+npm.cmd run rebrand -- --name "Contoso Workspace" --scope "@contoso"
+```
+
 Review every changed file after rebranding. The script only changes repository-controlled names. It intentionally does not rename cloud resources.
+
+The script renames filesystem paths first and writes `brand.config.json` last so an interrupted run can be recovered. If a local editor/process locks a path and the command fails, close the locking process, reset the disposable/derived working tree (`git restore . && git clean -fd` if appropriate for your uncommitted work), then rerun the rebrand.
 
 ## Choose the host
 
@@ -73,13 +83,21 @@ The default `npm run dev` starts the Azure mode because it behaves like a conven
 npm run dev
 ```
 
-For a Power Apps Code App, use the Power Apps local host after initializing the app:
+For a Power Apps Code App, use a **dedicated non-default Power Platform environment**. Before writing anything to the environment, verify both independent CLI authentication contexts:
+
+```bash
+bash scripts/check-powerplatform-auth.sh
+```
+
+Then initialize and run the app:
 
 ```bash
 cd src/frontend
 npx --no-install pa app init --display-name "Contoso Workspace" --environment-id <environment-id>
 npx --no-install pa app run
 ```
+
+The frontend `dev` command used by `pa app run` starts Vite in Power Apps mode on strict port 3000. Repository-level `npm run dev` remains Azure mode; `npm run dev:powerapps` is available when you need to start only the Power Apps Vite process.
 
 For Power Pages, regular Vite development is useful for UI work, but Power Pages session, CSRF and Server Logic behavior must be validated in the real Code Site.
 

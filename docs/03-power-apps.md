@@ -24,9 +24,27 @@ Do not copy a fake `power.config.json` from another tenant.
 
 ## Local host
 
+The frontend workspace intentionally makes its plain `npm run dev` command Power Apps-specific: it starts Vite in `powerapps` mode on strict port `3000`, which is the local URL expected by the pinned Power Apps CLI. The repository-level `npm run dev` remains Azure-mode development.
+
+Before starting, verify the active Power Apps CLI identity:
+
+```bash
+npx --no-install pa auth status
+```
+
+Then run from `src/frontend`:
+
 ```bash
 npx --no-install pa app run
 ```
+
+For diagnostics you can start only Vite from the repository root:
+
+```bash
+npm run dev:powerapps
+```
+
+The Vite configuration also treats the CLI's default `development` config-load mode as Power Apps so `pa app run` can inspect the configuration before it starts the dev command.
 
 Open the Local Play URL using the same browser profile used for the Power Platform tenant.
 
@@ -81,11 +99,25 @@ npm run configure:powerapps-ping -- --api-name <publisher-prefix>_BoilerplatePin
 
 The second command rewrites only `src/frontend/src/platform/powerapps/boilerplatePingBridge.ts` so the Power Apps adapter calls the generated service. Shared feature code continues to depend only on `PlatformClient`.
 
-The generated Dataverse service is environment metadata/transport and should be regenerated when the Custom API contract changes.
+The generated Dataverse service is environment metadata/transport and should be regenerated when the Custom API contract changes. The bridge helper follows the generated CLI result contract (`success`, `data`, `error`) and the generated service-class casing.
+
+On Windows PowerShell, use `npm.cmd` when forwarding arguments through npm:
+
+```powershell
+npm.cmd run configure:powerapps-ping -- --api-name <publisher-prefix>_BoilerplatePing
+```
 
 ## Authentication
 
 Authentication is owned by the Power Apps host. Do not add a second MSAL login flow merely to identify the same Power Apps user.
+
+The npm Power Apps CLI (`pa`) and Power Platform CLI (`pac`) keep separate authentication state. Before any command that creates, shares, pushes, registers, synchronizes or imports Power Platform resources, verify both explicitly from the repository root:
+
+```bash
+bash scripts/check-powerplatform-auth.sh
+```
+
+Do not assume that a correct `pac auth list` means `pa` is connected to the same tenant/environment.
 
 ## Unattended publishing
 
@@ -97,14 +129,17 @@ Variables:
 
 - `POWERAPPS_TENANT_ID`
 - `POWERAPPS_CLIENT_ID`
-- `POWERAPPS_SOLUTION_ID` (optional)
+- `POWERAPPS_ENVIRONMENT_NAME`
+- `POWERAPPS_SOLUTION_ID`
 - `POWERAPPS_AUTO_DEPLOY`
 
 Secret:
 
 - `POWERAPPS_CLIENT_SECRET`
 
-Before the service principal can update an existing Code App, an app maker must grant it **edit** access. Use the Enterprise Application object ID when sharing the app, not the App Registration object ID.
+Unattended Code App deployment in this template requires a **dedicated non-default Power Platform environment**. The field-tested default environment path (`Default-<tenant id>`) cannot complete the required service-principal sharing/access flow reliably, so the deployment workflow rejects it instead of failing later with an opaque 403.
+
+Before the service principal can update an existing Code App in the dedicated environment, an app maker must grant it **edit** access. Use the Enterprise Application object ID when sharing the app, not the App Registration object ID.
 
 Typical one-time maker operation:
 
@@ -113,30 +148,27 @@ pa auth login --account <maker>
 npx --no-install pa app share --principal <enterprise-application-object-id> --access edit
 ```
 
-The CI job then publishes:
-
-```bash
-npx --no-install pa app push --non-interactive
-```
-
-## Solution-aware publishing
-
-If `POWERAPPS_SOLUTION_ID` is set, the workflow uses:
+The CI job always publishes to an explicit solution:
 
 ```bash
 npx --no-install pa app push --non-interactive --solution-id <solution-id>
 ```
 
+## Solution-aware publishing is mandatory
+
+`POWERAPPS_SOLUTION_ID` is required. The workflow never falls back to a plain `pa app push`, because without `--solution-id` the CLI can associate the app with the environment's preferred solution rather than the intended product solution.
+
 ## First deployment sequence
 
-1. create/choose Power Platform environment;
+1. create/choose a **dedicated non-default** Power Platform environment;
 2. enable Code Apps if required;
-3. initialize `src/frontend`;
-4. publish once interactively as maker;
-5. share edit access with deployment service principal;
-6. add GitHub Environment values;
-7. manually run `Deploy Power Apps Code App`;
-8. only then consider setting `POWERAPPS_AUTO_DEPLOY=true`.
+3. run `bash scripts/check-powerplatform-auth.sh` and verify both CLIs;
+4. initialize `src/frontend` with that environment;
+5. publish once interactively as maker into the intended solution;
+6. share edit access with the deployment service principal;
+7. add all GitHub Environment values, including `POWERAPPS_ENVIRONMENT_NAME` and `POWERAPPS_SOLUTION_ID`;
+8. manually run `Deploy Power Apps Code App`;
+9. only then consider setting `POWERAPPS_AUTO_DEPLOY=true`.
 
 ## Microsoft documentation
 

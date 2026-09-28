@@ -79,6 +79,8 @@ Before starting a real application:
 npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@contoso/platform"
 ```
 
+On Windows PowerShell use `npm.cmd run rebrand -- --name ...` so forwarded arguments reach the script correctly.
+
 ## Deployment
 
 | Target | Workflow | Deployment identity |
@@ -93,6 +95,8 @@ npm run rebrand -- --name "Contoso Workspace" --scope "@contoso" --code-owner "@
 | Dataverse solution | `deploy-powerplatform-solution.yml` | Power Platform OIDC/FIC |
 
 Fresh template repositories do **not** deploy automatically until the relevant `*_AUTO_DEPLOY` repository-level GitHub variable is explicitly enabled. Manual deployments remain available.
+
+Power Apps unattended deployment additionally requires a dedicated non-default Power Platform environment and an explicit product solution GUID; the workflow refuses a default environment or a missing `POWERAPPS_SOLUTION_ID`.
 
 ## Security
 

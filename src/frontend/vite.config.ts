@@ -10,7 +10,11 @@ const adapterByMode: Record<string, string> = {
 };
 
 export default defineConfig(({ mode }) => {
-  const adapter = adapterByMode[mode];
+  // Power Apps CLI may load Vite config in the default "development" mode
+  // before it starts the project's dev command. Treat that config-only load
+  // as Power Apps; explicit npm scripts still select their intended host.
+  const effectiveMode = mode === "development" ? "powerapps" : mode;
+  const adapter = adapterByMode[effectiveMode];
   if (!adapter) {
     throw new Error(`Unsupported Vite mode '${mode}'. Use powerapps, powerpages or azure.`);
   }
@@ -18,7 +22,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
-      ...(mode === "powerapps" ? [powerApps()] : [])
+      ...(effectiveMode === "powerapps" ? [powerApps()] : [])
     ],
     resolve: {
       alias: {

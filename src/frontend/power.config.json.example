@@ -1,3 +1,3 @@
 {
-  "_comment": "Run npx --no-install pa app init --display-name <name> --environment-id <environment-id> in src/frontend. Do not copy fake environment/app IDs from a template."
+  "_comment": "Run npx --no-install pa app init --display-name <name> --environment-id <dedicated-non-default-environment-id> in src/frontend. Do not use a Default-* environment for unattended CI deployment and do not copy fake environment/app IDs from a template."
 }

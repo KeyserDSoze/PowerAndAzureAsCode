@@ -121,6 +121,8 @@ Where available, enable:
 - Dependabot security updates;
 - CodeQL/code scanning.
 
+For a private derived repository, enable GitHub Code Security/code scanning **before** setting repository variable `CODEQL_ENABLED=true`. The CodeQL job is skipped in private repositories until that variable is explicitly enabled.
+
 The committed Dependabot configuration handles routine version updates; repository security settings handle vulnerability/security alert behavior.
 
 ## Fresh derived repository checklist
@@ -134,4 +136,5 @@ The committed Dependabot configuration handles routine version updates; reposito
 7. Verify a test PR cannot merge until required checks pass.
 8. Verify production deployment stops for approval where configured.
 9. Verify force push/delete of `main` is blocked.
-10. Run `scripts/verify-github-repository.sh` and resolve or explicitly document any intended drift.
+10. For private repositories, enable code scanning and set `CODEQL_ENABLED=true` when the repository/organization has the required GitHub Code Security capability.
+11. Run `scripts/verify-github-repository.sh` and resolve or explicitly document any intended drift.
