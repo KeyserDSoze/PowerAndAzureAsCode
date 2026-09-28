@@ -1,6 +1,6 @@
 # Microsoft references
 
-Last reviewed for this boilerplate: **2026-09-26**.
+Last reviewed for this boilerplate: **2026-09-28**.
 
 Microsoft platform behavior changes. Re-check these sources before material platform upgrades.
 
@@ -35,6 +35,13 @@ Microsoft platform behavior changes. Re-check these sources before material plat
 - App Service Managed Identity: https://learn.microsoft.com/azure/app-service/overview-managed-identity
 - App Service Key Vault references: https://learn.microsoft.com/azure/app-service/app-service-key-vault-references
 - Azure RBAC role assignments: https://learn.microsoft.com/azure/role-based-access-control/role-assignments-cli
+
+## Dataverse plug-in packages
+
+- Build/package plug-in code: https://learn.microsoft.com/power-apps/developer/data-platform/build-and-package
+- Create/register a plug-in package: https://learn.microsoft.com/power-platform/developer/howto/cli-create-package
+- PAC plug-in commands: https://learn.microsoft.com/power-platform/developer/cli/reference/plugin
+- Microsoft.PowerApps.MSBuild.Solution package: https://www.nuget.org/packages/Microsoft.PowerApps.MSBuild.Solution
 
 ## Dataverse application users
 
