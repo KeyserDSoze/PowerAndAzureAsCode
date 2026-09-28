@@ -23,6 +23,8 @@ const requiredFiles = [
   "scripts/bootstrap-azure-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-deployment-identity.sh",
   "scripts/bootstrap-powerplatform-solution.sh",
+  "scripts/check-powerplatform-auth.sh",
+  "scripts/pin-powerplatform-solution-package-cli.mjs",
   "scripts/bootstrap-github-repository.sh",
   "scripts/verify-github-repository.sh",
   "scripts/install-powerpages-server-logic-example.mjs",
@@ -85,8 +87,31 @@ if (!nodeVersion || nodeVersion !== nvmVersion) {
 }
 
 const globalJson = JSON.parse(await readFile(resolve("global.json"), "utf8"));
-if (!/^10\.0\.\d+$/.test(globalJson?.sdk?.version ?? "")) {
-  throw new Error("global.json must pin an explicit .NET 10 SDK version.");
+if (!/^10\.0\.4\d{2}$/.test(globalJson?.sdk?.version ?? "")) {
+  throw new Error("global.json must pin the .NET 10.0.4xx SDK feature band.");
+}
+
+if (globalJson?.sdk?.rollForward !== "latestPatch") {
+  throw new Error("global.json must keep rollForward=latestPatch for the pinned 10.0.4xx feature band.");
+}
+
+if (!frontendPackage.scripts?.dev?.includes("--mode powerapps") ||
+    !frontendPackage.scripts?.dev?.includes("--port 3000") ||
+    !frontendPackage.scripts?.dev?.includes("--strictPort")) {
+  throw new Error("src/frontend npm dev must start the Power Apps Vite host on strict port 3000.");
+}
+
+if (!rootPackage.scripts?.["dev:powerapps"] || !frontendPackage.scripts?.["dev:azure"]) {
+  throw new Error("Root/frontend package scripts must expose explicit Power Apps and Azure dev commands.");
+}
+
+const pluginProject = await readFile(
+  resolve("src/backends/dataverse/PowerAndAzureAsCode.Dataverse.Plugins/PowerAndAzureAsCode.Dataverse.Plugins.csproj"),
+  "utf8"
+);
+
+if (!pluginProject.includes("<TargetFramework>net462</TargetFramework>")) {
+  throw new Error("Dataverse plug-in package must target net462 for package/solution compatibility.");
 }
 
 for (const envFile of [
