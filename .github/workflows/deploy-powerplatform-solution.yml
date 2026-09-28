@@ -86,7 +86,93 @@ jobs:
             exit 1
           fi
 
-          unzip -Z1 "${packages[0]}" | grep -qE '\.dll$'
+          contents_file="$RUNNER_TEMP/powerplatform-plugin-package-contents.txt"
+          unzip -Z1 "${packages[0]}" > "$contents_file"
+          grep -qE '\.dll
+      - name: Push registered plug-in package update
+        shell: bash
+        run: |
+          set -euo pipefail
+          pac plugin push \
+            --pluginId "$PLUGIN_PACKAGE_ID" \
+            --pluginFile "${{ steps.plugin.outputs.path }}" \
+            --type Nuget \
+            --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}"
+
+      - name: Locate solution project
+        id: solution
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t projects < <(find "$SOLUTION_ROOT" -type f -name '*.cdsproj' | sort)
+          if [ "${#projects[@]}" -ne 1 ]; then
+            echo "Expected exactly one .cdsproj under $SOLUTION_ROOT, found ${#projects[@]}." >&2
+            echo "Run scripts/bootstrap-powerplatform-solution.sh in the derived repository." >&2
+            exit 1
+          fi
+          echo "project=${projects[0]}" >> "$GITHUB_OUTPUT"
+          echo "project_dir=$(dirname "${projects[0]}")" >> "$GITHUB_OUTPUT"
+
+      - name: Restore locked solution project
+        run: dotnet restore "${{ steps.solution.outputs.project }}" --locked-mode
+
+      - name: Build solution
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          case "$PACKAGE_TYPE" in
+            managed) solution_package_type="Managed" ;;
+            unmanaged) solution_package_type="Unmanaged" ;;
+            *)
+              echo "POWERPLATFORM_SOLUTION_PACKAGE_TYPE must be managed or unmanaged." >&2
+              exit 1
+              ;;
+          esac
+
+          dotnet build "${{ steps.solution.outputs.project }}" \
+            --configuration Release \
+            --no-restore \
+            -p:SolutionPackageType="$solution_package_type"
+
+      - name: Locate package
+        id: package
+        shell: bash
+        run: |
+          set -euo pipefail
+          output_dir="${{ steps.solution.outputs.project_dir }}/bin/Release"
+          mapfile -t candidates < <(find "$output_dir" -type f -name '*.zip' | sort)
+
+          if [ "${#candidates[@]}" -ne 1 ]; then
+            echo "Expected exactly one solution zip under $output_dir, found ${#candidates[@]}." >&2
+            printf '%s\n' "${candidates[@]}"
+            exit 1
+          fi
+
+          echo "path=${candidates[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Import solution
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          settings_args=()
+          if [ -n "$SETTINGS_FILE" ]; then
+            test -f "$SETTINGS_FILE" || {
+              echo "Power Platform deployment settings file not found: $SETTINGS_FILE" >&2
+              exit 1
+            }
+            settings_args+=(--settings-file "$SETTINGS_FILE")
+          fi
+
+          pac solution import \
+            --path "${{ steps.package.outputs.path }}" \
+            --environment "${{ vars.POWERPLATFORM_DEPLOY_ENVIRONMENT_URL }}" \
+            --activate-plugins \
+            --publish-changes \
+            --async \
+            "${settings_args[@]}"
+ "$contents_file"
           echo "path=${packages[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Push registered plug-in package update
