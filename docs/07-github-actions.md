@@ -16,7 +16,7 @@ Runs:
 
 `.github/workflows/deploy-powerapps.yml`
 
-Builds Power Apps mode and publishes with `pa app push --non-interactive`.
+Builds Power Apps mode and publishes only to a **dedicated non-default Power Platform environment**. It requires `POWERAPPS_SOLUTION_ID` and always uses `pa app push --non-interactive --solution-id ...`; it never falls back to the environment's preferred solution.
 
 ### Power Pages
 
@@ -58,13 +58,15 @@ Protected manual workflow that assigns the runtime application to Dataverse with
 
 `.github/workflows/deploy-powerplatform-solution.yml`
 
-Builds the derived Dataverse solution project and imports the selected managed/unmanaged package using PAC CLI + GitHub OIDC/FIC. The generic template intentionally has no product solution project until `scripts/bootstrap-powerplatform-solution.sh` is run in a derived repository.
+After the one-time DEV registration documented in `19-power-platform-alm.md`, builds a fresh/non-incremental Dataverse plug-in NuGet package, updates the registered package with `pac plugin push`, then restores/builds the derived solution in locked mode and imports it using PAC CLI + GitHub OIDC/FIC. The generic template intentionally has no product solution project until `scripts/bootstrap-powerplatform-solution.sh` is run in a derived repository.
 
 ### CodeQL
 
 `.github/workflows/codeql.yml`
 
 Analyzes JavaScript/TypeScript and C#.
+
+The workflow includes `actions: read`, which is needed for private repositories. Public repositories run analysis by default. A private derived repository runs the analysis job only when repository variable `CODEQL_ENABLED=true`; enable GitHub Code Security/code scanning first. This prevents a private repository without code-scanning entitlement/configuration from failing only at result upload.
 
 ## GitHub Environments
 
