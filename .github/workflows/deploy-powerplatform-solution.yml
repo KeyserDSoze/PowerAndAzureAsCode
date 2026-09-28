@@ -88,7 +88,7 @@ jobs:
 
           contents_file="$RUNNER_TEMP/powerplatform-plugin-package-contents.txt"
           unzip -Z1 "${packages[0]}" > "$contents_file"
-          grep -qE '\.dll$' "$contents_file"
+          grep -qE '[.]dll$' "$contents_file"
           echo "path=${packages[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Push registered plug-in package update
