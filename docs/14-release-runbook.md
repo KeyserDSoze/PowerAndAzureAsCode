@@ -26,11 +26,14 @@ dotnet build src/backends/azure-api/PowerAndAzureAsCode.Api/PowerAndAzureAsCode.
 
 Preconditions:
 
+- target is a **dedicated non-default** Power Platform environment;
 - `src/frontend/power.config.json` initialized and committed in derived repo;
+- `POWERAPPS_ENVIRONMENT_NAME` identifies that dedicated environment;
+- `POWERAPPS_SOLUTION_ID` is the intended product solution GUID and is mandatory;
 - deployment service principal has environment access;
 - service principal has edit access to the existing Code App;
 - client secret is valid;
-- optional solution ID is correct.
+- local/admin work has verified both `pa` and `pac` authentication with `scripts/check-powerplatform-auth.sh`.
 
 Run:
 
@@ -84,6 +87,17 @@ Ensure Azure OIDC/FIC and App Service name are correct.
 Run API workflow.
 
 Verify the API from the authenticated Static Web App origin using `/api/health`, `/api/me` and `/api/dataverse/health`. The Dataverse connectivity endpoint must succeed before promotion.
+
+## Power Platform solution / plug-in release
+
+Before using `Deploy Power Platform Solution`:
+
+- complete the one-time DEV sequence in `19-power-platform-alm.md`;
+- register the plug-in package once with PRT;
+- configure `POWERPLATFORM_PLUGIN_PACKAGE_ID`;
+- commit the synchronized solution `.cdsproj` and `packages.lock.json`.
+
+The workflow then creates a clean/non-incremental plug-in package, verifies it, updates the existing registration with `pac plugin push`, and only then builds/imports the solution.
 
 ## Dataverse runtime readiness
 
