@@ -29,7 +29,7 @@ jobs:
       APP_SERVICE_PLAN_CAPACITY: ${{ vars.AZURE_APP_SERVICE_PLAN_CAPACITY || '1' }}
       KEY_VAULT_PUBLIC_NETWORK_ACCESS: ${{ vars.AZURE_KEY_VAULT_PUBLIC_NETWORK_ACCESS || 'Enabled' }}
     steps:
-      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Azure login with OIDC
         uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3
         with:
